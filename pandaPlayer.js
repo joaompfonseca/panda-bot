@@ -12,26 +12,30 @@ let seekTime = 0;
 let isPlaying = false;
 */
 
+let msg = null;
 let chat = null;
-let voiceChannel = null;
+
+let userVC = null;
+let botVC = null;
+
 let connection = null;
 let dispatcher = null;
 
-let seekTime = 0;
-
-let isPlaying = false;
+let isPlaying = false; // == dispatcher ativo
 let isPaused = false;
+
+let seekTime = 0;
 
 const m = {
     error: 'Ocorreu um erro ao executar o comando!',
     join: {
-        success: (connection) => `Conectado a <#${connection.channel.id}>.`,
-        already: (connection) => `Já estou conectado a <#${connection.channel.id}>! Não tens olhos na vista?`,
-        noChannel: 'Como é que queres que eu entre se não estás num canal?'
+        success: (VC) => `Conectado a <#${VC.id}>.`,
+        already: (VC) => `Já estou conectado a <#${VC.id}>! Não tens olhos na vista?`,
+        userNotVC: 'Como é que queres que eu entre se não estás num canal?'
     },
     leave: {
-        success: (connection) => `Desconectado de <#${connection.channel.id}>.`,
-        noChannel: 'Como é que queres que eu saia se não estou num canal?'
+        success: (VC) => `Desconectado de <#${VC.id}>.`,
+        botNotVC: 'Como é que queres que eu saia se não estou num canal?'
     }
 }
 
@@ -43,46 +47,47 @@ module.exports = class PandaPlayer {
 
     async join(msg) {
         /*
-        BOT joins the voice channel where USER is
+        BOT joins USER's VC
         */
         try {
+            this.msg = msg;
             chat = msg.channel;
-            voiceChannel = msg.member.voice.channel;
+            userVC = msg.member.voice.channel;
             /*
             Returns IF:
-                > USER is in not in a voice channel
+                > USER is in not in a VC
             */
-            if (voiceChannel == null) {
-                chat.send(m.join.noChannel);
+            if (userVC == null) {
+                chat.send(m.join.userNotVC);
                 return;
             }
             /*
             Returns IF:
-                > BOT has a conection
+                > BOT is in a VC
                 AND
-                > BOT is in the same voice channel as USER
+                > BOT is in same VC as USER
             */
-            if (connection != null && connection.channel == voiceChannel) {
-                chat.send(m.join.already(connection));
+            if (botVC != null && botVC == userVC) {
+                chat.send(m.join.already(botVC));
                 return;
             }
             /*
-            Leaves current channel IF:
-                > BOT has a conection
+            BOT leaves its VC IF:
+                > BOT is in a VC
                 AND
-                > BOT is in a different voice channel than USER
+                > BOT is in different VC of USER
             */
-            if (connection != null && connection.channel != voiceChannel) {
+            if (botVC != null && botVC != userVC) {
                 this.leave(msg);
             }
-            /*
-            Attempts to create a new connection and a disconnect listener
-            */
-            connection = await voiceChannel.join();
+            //Create a new connection
+            connection = await userVC.join();
+            botVC = connection.channel;
+            chat.send(m.join.success(botVC));
+            //Create 'disconnect' listner
             connection.on('disconnect', () => {
-                this.leave(msg, true);
+                this.leave(this.msg);
             });
-            chat.send(m.join.success(connection));
             /*
             Continues playing where it left IF:
                 > BOT was playing
@@ -98,39 +103,30 @@ module.exports = class PandaPlayer {
         }
     }
 
-    leave(msg, resetVars = false) {
+    leave(msg) {
         /*
-        BOT leaves current voice channel
+        BOT leaves current VC
         */
         try {
+            this.msg = msg;
             chat = msg.channel;
             /*
             Returns IF:
-                > BOT is in not in a voice channel
+                > BOT is not in a VC
             */
-            if (voiceChannel == null) {
-                chat.send(m.leave.noChannel);
+            if (botVC == null) {
+                chat.send(m.leave.botNotVC);
                 return;
             }
-            /*
-            Saves seekTime and removes all connection listeners
-            */
-            if (dispatcher != null) seekTime += dispatcher.streamTime;
+            //Save seekTime
+            if (isPlaying) seekTime += dispatcher.streamTime;
+            //Remove 'disconnect' listner
             connection.removeAllListeners();
-            /*
-            BOT leaves current voice channel
-            */
-            voiceChannel.leave();
-            chat.send(m.leave.success(connection));
-            /*
-            Resets variables
-            */
-            if (resetVars) {
-                chat = null;
-                voiceChannel = null;
-                connection = null;
-                dispatcher = null;
-            }
+            //Leave channel
+            botVC.leave();
+            chat.send(m.leave.success(botVC));
+            //Set botVC to null
+            botVC = null;
         }
         catch (e) {
             console.log(e.message);
