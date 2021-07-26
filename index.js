@@ -29,6 +29,7 @@ client.on('ready', () => {
 });
 
 client.on('message', msg => {
+    let chat = msg.channel;
     let text = msg.content.trim();
     let argsPos = text.search("\\s");
 
@@ -45,13 +46,13 @@ client.on('message', msg => {
             for (let key in help) {
                 output += `\n\t\`${key}\` : ${help[key]}`;
             }
-            msg.channel.send(output);
+            chat.send(output);
             break;
         case 'ping':
-            msg.channel.send('Pinging...').then(m => {
+            chat.send('Pinging...').then(m => {
                 let ping = m.createdTimestamp - msg.createdTimestamp;
                 m.delete();
-                msg.channel.send(`Pong! ${ping} ms`);
+                chat.send(`Pong! ${ping} ms`);
             });
             break;
         case 'mc':
@@ -72,18 +73,20 @@ client.on('message', msg => {
                         .addField('Descrição', data.description.descriptionText, true)
                         .addField(`Jogadores (${data.onlinePlayers}/${data.maxPlayers})`, playerNames, true);
 
-                    msg.channel.send(mcInfo);
+                        chat.send(mcInfo);
                 })
-                .catch(error => {
-                    console.log(error);
+                .catch(e => {
                     let mcInfo = new Discord.MessageEmbed()
                         .setColor('#FF0000')
                         .setAuthor('OFFLINE', 'https://www.freeiconspng.com/uploads/minecraft-icon-0.png')
 
-                    msg.channel.send(mcInfo);
+                    chat.send(mcInfo);
                 });
             break;
         case 'join':
+            pandaPlayer.join(msg);
+            break;
+        /*case 'join':
             pandaPlayer.join(msg);
             break;
         case 'play':
@@ -93,16 +96,16 @@ client.on('message', msg => {
                     pandaPlayer.addSong(data.all[0]);
                     pandaPlayer.play();
                 });
-            break;
+            break;*/
         case 'leave':
-            pandaPlayer.leave(msg);
+            pandaPlayer.leave(msg, true);
             break;
-        case 'pause':
+        /*case 'pause':
             pandaPlayer.pause();
             break;
         case 'resume':
             pandaPlayer.resume();
-            break;
+            break;*/
         default:
             msg.channel.send('Esse comando não existe. Tenta `pb.help` para não passares vergonha novamente.');
     }
