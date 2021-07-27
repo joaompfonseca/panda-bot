@@ -98,7 +98,7 @@ client.on('message', msg => {
                 });
             break;*/
         case 'leave':
-            pandaPlayer.leave(msg, true);
+            pandaPlayer.leave(msg);
             break;
         /*case 'pause':
             pandaPlayer.pause();

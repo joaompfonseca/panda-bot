@@ -21,7 +21,7 @@ let botVC = null;
 let connection = null;
 let dispatcher = null;
 
-let isPlaying = false; // == dispatcher ativo
+let isPlaying = false; //== dispatcher ativo
 let isPaused = false;
 
 let seekTime = 0;
