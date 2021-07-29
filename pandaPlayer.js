@@ -4,34 +4,12 @@ const ytdl = require('ytdl-core');
 //const msg = new Discord.Message();
 //const connection = new Discord.VoiceConnection();
 
-/*
-let connection;
-let dispatcher;
-let queue = [];
-let seekTime = 0;
-let isPlaying = false;
-*/
-
-let msg = null;
-let chat = null;
-
-let userVC = null;
-let botVC = null;
-
-let connection = null;
-let dispatcher = null;
-
-let isPlaying = false; // == dispatcher ativo
-let isPaused = false;
-
-let seekTime = 0;
-
 const m = {
     error: 'Ocorreu um erro ao executar o comando!',
     join: {
         success: (VC) => `Conectado a <#${VC.id}>.`,
         already: (VC) => `Já estou conectado a <#${VC.id}>! Não tens olhos na vista?`,
-        userNotVC: 'Como é que queres que eu entre se não estás num canal?'
+        userNotVC: 'Como é que queres que eu entre se não estás num canal?' 
     },
     leave: {
         success: (VC) => `Desconectado de <#${VC.id}>.`,
@@ -39,8 +17,15 @@ const m = {
     }
 }
 
-module.exports = class PandaPlayer {
+/*
+Defining PandaPlayer vars outside the class to eliminate 'this' references inside the code for better reading
+*/
+let prevMsg, chat = userVC = botVC = connection = dispatcher = null;    // refs
+let isPlaying, isPaused = false;                                        // boolean
+let seekTime = 0;                                                       // int
 
+module.exports = class PandaPlayer {
+    
     async seek() {
 
     }
@@ -50,7 +35,7 @@ module.exports = class PandaPlayer {
         BOT joins USER's VC
         */
         try {
-            this.msg = msg;
+            prevMsg = msg;
             chat = msg.channel;
             userVC = msg.member.voice.channel;
             /*
@@ -78,7 +63,7 @@ module.exports = class PandaPlayer {
                 > BOT is in different VC of USER
             */
             if (botVC != null && botVC != userVC) {
-                this.leave(msg);
+                this.leave(msg, true);
             }
             //Create a new connection
             connection = await userVC.join();
@@ -86,7 +71,10 @@ module.exports = class PandaPlayer {
             chat.send(m.join.success(botVC));
             //Create 'disconnect' listner
             connection.on('disconnect', () => {
-                this.leave(this.msg);
+                this.leave(prevMsg);
+            })
+            .on('reconnecting', () => {
+                this.join(prevMsg);             // VER ESTA PORCARIA!!!!
             });
             /*
             Continues playing where it left IF:
@@ -103,12 +91,12 @@ module.exports = class PandaPlayer {
         }
     }
 
-    leave(msg) {
+    leave(msg, VCToVC = false) {
         /*
         BOT leaves current VC
         */
         try {
-            this.msg = msg;
+            prevMsg = msg;
             chat = msg.channel;
             /*
             Returns IF:
@@ -123,7 +111,8 @@ module.exports = class PandaPlayer {
             //Remove 'disconnect' listner
             connection.removeAllListeners();
             //Leave channel
-            botVC.leave();
+            if (!VCToVC)
+                botVC.leave();
             chat.send(m.leave.success(botVC));
             //Set botVC to null
             botVC = null;
