@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const yts = require('yt-search');
 const ytdl = require('ytdl-core');
 
 //const msg = new Discord.Message();
@@ -9,20 +10,24 @@ const m = {
     join: {
         success: (VC) => `Conectado a <#${VC.id}>.`,
         already: (VC) => `Já estou conectado a <#${VC.id}>! Não tens olhos na vista?`,
-        userNotVC: 'Como é que queres que eu entre se não estás num canal?' 
+        userNotVC: 'Como é que queres que eu entre se não estás num canal?'
     },
     leave: {
         success: (VC) => `Desconectado de <#${VC.id}>.`,
         botNotVC: 'Como é que queres que eu saia se não estou num canal?'
+    },
+    play: {
+        userNotVC: 'Não me podes pedir discos antes de entrares num canal!'
     }
 }
 
 /*
 Defining PandaPlayer vars outside the class to eliminate 'this' references inside the code for better reading
 */
-let prevMsg, chat = userVC = botVC = connection = listners = dispatcher = null;  // refs
-let isPlaying, isPaused = false;                                                        // boolean
-let seekTime = 0;                                                                       // int
+let prevMsg = chat = userVC = botVC = connection = dispatcher = null;         // refs
+let isPlaying = isPaused = false;                                             // boolean
+let seekTime = 0;                                                             // int
+let queue = [];                                                               // array {title: song.title, url: song.url}
 
 module.exports = class PandaPlayer {
     /*
@@ -60,7 +65,7 @@ module.exports = class PandaPlayer {
     BOT connects to VC
     */
     async connectTo(VC) {
-        
+
         try {
             /*
             create a new connection
@@ -83,9 +88,9 @@ module.exports = class PandaPlayer {
                     }, 300);
                 });
             /*
-            BOT was playing && BOT was not paused -> continue to play where it left
+            BOT is playing && BOT is not paused -> continue to play where it left
             */
-            if (isPlaying && !isPaused) this.seek();
+            if (isPlaying && !isPaused) this.start(seekTime);
         }
         catch (e) {
             console.log(e.message);
@@ -123,6 +128,104 @@ module.exports = class PandaPlayer {
         }
     }
 
+    /*
+    BOT handles play request of USER
+    */
+    async play(msg, req) {
+        try {
+            prevMsg = msg;
+            chat = msg.channel;
+            userVC = msg.member.voice.channel;
+            /*
+            USER is not in a VC -> return
+            */
+            if (userVC == null) return chat.send(m.play.userNotVC);
+            /*
+            BOT is in different VC of USER -> leave current VC
+            */
+            if (botVC != null && botVC != userVC) this.leave(msg);
+            /*
+            BOT is not in VC of USER -> create a new connection
+            */
+            if (botVC != userVC) setTimeout(() => this.connectTo(userVC), 300);
+            /*
+            add request to queue
+            */
+            await this.addToQueue(req);
+            /*
+            BOT is not playing -> start to play
+            */
+            if (!isPlaying) this.start();
+        }
+        catch (e) {
+            console.log(e.message);
+            chat.send(m.error);
+        }
+    }
+
+    /*
+    BOT adds request to queue
+    */
+    async addToQueue(req) {
+        try {
+            /*
+            request is a Youtube video link
+            */
+            if (req.includes('www.youtube.com/watch?v=')) {
+                /*
+                get videoId from request
+                */
+                let videoID = req.substring(
+                    req.search('=') + 1, 
+                    (req.search('&') == -1) ? req.length : req.search('&')
+                );
+                /*
+                return video data
+                */
+                let data = await yts({
+                    videoId: videoID
+                });
+                /*
+                add to queue
+                */
+                queue.push({
+                    type: 'yt-video',
+                    title: data.title,
+                    url: data.url
+                });
+            }
+        }
+        catch (e) {
+            console.log(e.message);
+            chat.send(m.error);
+        }
+    }
+
+    /*
+    BOT searches for request in Youtube
+    */
+    searchYT(req) {
+        try {
+            
+        }
+        catch (e) {
+            console.log(e.message);
+            chat.send(m.error);
+        }
+    }
+
+    /*
+    BOT plays leading request on queue + time shift in milliseconds (default - 0)
+    */
+    start(time = 0) {
+        try {
+            
+        }
+        catch (e) {
+            console.log(e.message);
+            chat.send(m.error);
+        }
+    }
 
 
 

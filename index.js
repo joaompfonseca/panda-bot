@@ -4,7 +4,7 @@ const Discord = require('discord.js');
 const PandaPlayer = require('./pandaPlayer');
 const mc = require('minecraft-server-util');
 const ytdl = require('ytdl-core');
-const yts = require('yt-search')
+const yts = require('yt-search');
 
 const app = express();
 const client = new Discord.Client();
@@ -102,6 +102,9 @@ client.on('message', msg => {
             break;*/
         case 'leave':
             pandaPlayer.leave(msg);
+            break;
+        case 'play':
+            pandaPlayer.play(msg, args);
             break;
         /*case 'pause':
             pandaPlayer.pause();
