@@ -91,9 +91,7 @@ client.on('message', msg => {
         case 'join':
             pandaPlayer.join(msg);
             break;
-        /*case 'join':
-            pandaPlayer.join(msg);
-            break;
+        /*
         case 'play':
             pandaPlayer.join(msg);
             yts(args)

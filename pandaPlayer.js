@@ -20,20 +20,15 @@ const m = {
 /*
 Defining PandaPlayer vars outside the class to eliminate 'this' references inside the code for better reading
 */
-let self, prevMsg = chat = userVC = botVC = connection = listners = dispatcher = null;    // refs
-let isPlaying, isPaused = false;                                      // boolean
-let seekTime = 0;                                                       // int
+let prevMsg, chat = userVC = botVC = connection = listners = dispatcher = null;  // refs
+let isPlaying, isPaused = false;                                                        // boolean
+let seekTime = 0;                                                                       // int
 
 module.exports = class PandaPlayer {
-    
-    constructor() {
-        self = this;
-    }
-
+    /*
+    BOT joins USER's VC
+    */
     join(msg) {
-        /*
-        BOT joins USER's VC
-        */
         try {
             prevMsg = msg;
             chat = msg.channel;
@@ -49,11 +44,11 @@ module.exports = class PandaPlayer {
             /*
             BOT is in different VC of USER -> leave current VC
             */
-            if (botVC != null && botVC != userVC) self.leave(msg);
+            if (botVC != null && botVC != userVC) this.leave(msg);
             /*
             create a new connection
             */
-            setTimeout(() => self.connectTo(userVC), 150);
+            setTimeout(() => this.connectTo(userVC), 300);
         }
         catch (e) {
             console.log(e.message);
@@ -61,10 +56,11 @@ module.exports = class PandaPlayer {
         }
     }
 
+    /*
+    BOT connects to VC
+    */
     async connectTo(VC) {
-        /*
-        BOT connects to VC
-        */
+        
         try {
             /*
             create a new connection
@@ -77,18 +73,19 @@ module.exports = class PandaPlayer {
             */
             connection
                 .once('disconnect', () => {
-                    self.leave(prevMsg);
+                    this.leave(prevMsg);
                 })
-                .once('reconnecting', function() {
-                    this.removeAllListeners();
-                    self.leave(prevMsg);
-                    botVC = connection.channel;
-                    setTimeout(() => self.connectTo(botVC), 150);
-                })
+                .once('reconnecting', async () => {
+                    this.leave(prevMsg);
+                    setTimeout(() => {
+                        botVC = connection.channel;
+                        this.connectTo(botVC);
+                    }, 300);
+                });
             /*
             BOT was playing && BOT was not paused -> continue to play where it left
             */
-            if (isPlaying && !isPaused) self.seek();
+            if (isPlaying && !isPaused) this.seek();
             return;
         }
         catch (e) {
@@ -96,18 +93,18 @@ module.exports = class PandaPlayer {
             return chat.send(m.error);
         }
     }
-
+    
+    /*
+    BOT leaves current VC
+    */
     async leave(msg) {
-        /*
-        BOT leaves current VC
-        */
         try {
             prevMsg = msg;
             chat = msg.channel;
             /*
             BOT is not in a VC -> return
             */
-            if (botVC == null) return chat.send(m.leave.botNotVC); // PROBLEMA QUANDO MOVEMOS BOT DE SALA EM SALA
+            if (botVC == null) return chat.send(m.leave.botNotVC);
             /*
             save seekTime
             remove connection listeners ('disconnect' and 'reconnecting')
