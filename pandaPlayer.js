@@ -52,7 +52,7 @@ module.exports = class PandaPlayer {
         }
         catch (e) {
             console.log(e.message);
-            return chat.send(m.error);
+            chat.send(m.error);
         }
     }
 
@@ -86,14 +86,13 @@ module.exports = class PandaPlayer {
             BOT was playing && BOT was not paused -> continue to play where it left
             */
             if (isPlaying && !isPaused) this.seek();
-            return;
         }
         catch (e) {
             console.log(e.message);
-            return chat.send(m.error);
+            chat.send(m.error);
         }
     }
-    
+
     /*
     BOT leaves current VC
     */
@@ -117,11 +116,10 @@ module.exports = class PandaPlayer {
             botVC.leave();
             await chat.send(m.leave.success(botVC));
             botVC = null;
-            return;
         }
         catch (e) {
             console.log(e.message);
-            return chat.send(m.error);
+            chat.send(m.error);
         }
     }
 
