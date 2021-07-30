@@ -13,7 +13,12 @@ const prefix = "pb.";
 const help = {
     'help': 'é trivial',
     'ping': 'digo pong',
-    'mc': 'status do servidor'
+    'mc': 'status do servidor',
+    'join': 'dj panda ao serviço',
+    'leave': 'volto para o gabinete',
+    'play [...]': 'dou-te música',
+    'pause': 'para kit-kat',
+    'resume': 'a festa continua'
 };
 
 app.get('/', (req, res) => {
