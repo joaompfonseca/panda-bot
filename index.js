@@ -15,11 +15,20 @@ const help = {
     'ping': 'digo pong',
     'mc': 'status do servidor',
     'join': 'dj panda ao serviço',
-    'leave': 'volto para o gabinete',
+    'leave/disconnect': 'volto para o gabinete',
     'play [...]': 'dou-te música',
     'pause': 'para kit-kat',
-    'resume': 'a festa continua'
+    'resume': 'a festa continua',
+    'skip': 'salto para a próximo som'
 };
+const game = [
+    'Minecraft',
+    'GTA V',
+    'CS:GO',
+    'Xadrez',
+    'Team Fortress 2',
+    'Portal 2'
+];
 
 app.get('/', (req, res) => {
     res.send('Bot is online!');
@@ -88,30 +97,29 @@ client.on('message', msg => {
                     chat.send(mcInfo);
                 });
             break;
+        case 'game':
+            let index = Math.floor(Math.random() * game.length);
+            chat.send(game[index]);
+            break;
         case 'join':
             pandaPlayer.join(msg);
             break;
-        /*
-        case 'play':
-            pandaPlayer.join(msg);
-            yts(args)
-                .then(data => {
-                    pandaPlayer.addSong(data.all[0]);
-                    pandaPlayer.play();
-                });
-            break;*/
         case 'leave':
+        case 'disconnect':
             pandaPlayer.leave(msg);
             break;
         case 'play':
             pandaPlayer.play(msg, args);
             break;
-        /*case 'pause':
-            pandaPlayer.pause();
+        case 'pause':
+            pandaPlayer.pause(msg);
             break;
         case 'resume':
-            pandaPlayer.resume();
-            break;*/
+            pandaPlayer.resume(msg);
+            break;
+        case 'skip':
+            pandaPlayer.skip(msg);
+            break;
         default:
             msg.channel.send('Esse comando não existe. Tenta `pb.help` para não passares vergonha novamente.');
     }
