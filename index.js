@@ -1,5 +1,4 @@
 require('dotenv').config();
-require('@discordjs/opus');
 const express = require('express');
 const Discord = require('discord.js');
 const PandaPlayer = require('./pandaPlayer');
