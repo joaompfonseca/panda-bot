@@ -1,10 +1,9 @@
 require('dotenv').config();
+require('@discordjs/opus');
 const express = require('express');
 const Discord = require('discord.js');
 const PandaPlayer = require('./pandaPlayer');
 const mc = require('minecraft-server-util');
-const ytdl = require('ytdl-core');
-const yts = require('yt-search');
 
 const app = express();
 const client = new Discord.Client();
@@ -14,6 +13,7 @@ const help = {
     'help': 'é trivial',
     'ping': 'digo pong',
     'mc': 'status do servidor',
+    'game ?[...],[...]': 'sugiro-te um jogo',
     'join': 'dj panda ao serviço',
     'leave/disconnect': 'volto para o gabinete',
     'play [...]': 'dou-te música',
@@ -98,8 +98,13 @@ client.on('message', msg => {
                 });
             break;
         case 'game':
-            let index = Math.floor(Math.random() * game.length);
-            chat.send(game[index]);
+            let list = game;
+            if (args.length != 0) {
+                list = args.split(',');
+                list.forEach(g => g.trim());
+            }
+            let index = Math.floor(Math.random() * list.length);
+            chat.send(list[index]);
             break;
         case 'join':
             pandaPlayer.join(msg);
