@@ -129,4 +129,9 @@ client.on('message', msg => {
     }
 });
 
+client.on('error', (e) => {
+    console.log(e.message);
+    process.exit(1);
+})
+
 client.login(process.env.TOKEN);
