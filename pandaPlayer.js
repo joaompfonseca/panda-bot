@@ -8,9 +8,11 @@ const ytdl = require('ytdl-core');
 const m = {
     error: 'Ocorreu um erro ao executar o comando!',
     join: {
-        success: (VC) => `Conectado a <#${VC.id}>.`,
         already: (VC) => `Já estou conectado a <#${VC.id}>! Não tens olhos na vista?`,
         userNotVC: 'Como é que queres que eu entre se não estás num canal?'
+    },
+    connectTo: {
+        success: (VC) => `Conectado a <#${VC.id}>.`
     },
     leave: {
         success: (VC) => `Desconectado de <#${VC.id}>.`,
@@ -18,6 +20,16 @@ const m = {
     },
     play: {
         userNotVC: 'Não me podes pedir discos antes de entrares num canal!'
+    },
+    addToQueue: {
+        success: (info) => `Adicionei \`${info.title}\` à playlist.`,
+        notFound: 'Não encontrei nada que correspondesse ao teu pedido.'
+    },
+    start: {
+        isPaused: 'Estou em pausa!',
+        emptyQueue: 'A minha playlist está vazia!',
+        currentReq: (info) => `Agora: \`${info.title}\`.`,
+        endedReq: (info) => `Terminei: \`${info.title}\`.`
     }
 }
 
@@ -33,7 +45,7 @@ module.exports = class PandaPlayer {
     /*
     BOT joins USER's VC
     */
-    join(msg) {
+    async join(msg) {
         try {
             prevMsg = msg;
             chat = msg.channel;
@@ -49,11 +61,11 @@ module.exports = class PandaPlayer {
             /*
             BOT is in different VC of USER -> leave current VC
             */
-            if (botVC != null && botVC != userVC) this.leave(msg);
+            if (botVC != null && botVC != userVC) await this.leave(msg);
             /*
             create a new connection
             */
-            setTimeout(() => this.connectTo(userVC), 300);
+            this.connectTo(userVC);
         }
         catch (e) {
             console.log(e.message);
@@ -72,7 +84,7 @@ module.exports = class PandaPlayer {
             */
             connection = await VC.join();
             botVC = connection.channel;
-            await chat.send(m.join.success(botVC));
+            chat.send(m.connectTo.success(botVC));
             /*
             create connection listeners ('disconnect' and 'reconnecting')
             */
@@ -81,16 +93,14 @@ module.exports = class PandaPlayer {
                     this.leave(prevMsg);
                 })
                 .once('reconnecting', async () => {
-                    this.leave(prevMsg);
-                    setTimeout(() => {
-                        botVC = connection.channel;
-                        this.connectTo(botVC);
-                    }, 300);
+                    await this.leave(prevMsg);
+                    botVC = connection.channel;
+                    this.connectTo(botVC);
                 });
             /*
-            BOT is playing && BOT is not paused -> continue to play where it left
+            BOT is playing -> continue to play where it left
             */
-            if (isPlaying && !isPaused) this.start(seekTime);
+            if (isPlaying) this.start(seekTime);
         }
         catch (e) {
             console.log(e.message);
@@ -112,9 +122,11 @@ module.exports = class PandaPlayer {
             /*
             save seekTime
             remove connection listeners ('disconnect' and 'reconnecting')
+            remove dispatcher listener ('finish')
             */
             if (isPlaying) seekTime += dispatcher.streamTime;
-            connection.removeAllListeners();
+            if (connection != null) connection.removeAllListeners();
+            if (dispatcher != null) dispatcher.removeAllListeners();
             /*
             leave VC
             */
@@ -143,11 +155,11 @@ module.exports = class PandaPlayer {
             /*
             BOT is in different VC of USER -> leave current VC
             */
-            if (botVC != null && botVC != userVC) this.leave(msg);
+            if (botVC != null && botVC != userVC) await this.leave(msg);
             /*
             BOT is not in VC of USER -> create a new connection
             */
-            if (botVC != userVC) setTimeout(() => this.connectTo(userVC), 300);
+            if (botVC != userVC) await this.connectTo(userVC);
             /*
             add request to queue
             */
@@ -168,6 +180,7 @@ module.exports = class PandaPlayer {
     */
     async addToQueue(req) {
         try {
+            let data, info;
             /*
             request is a Youtube video link
             */
@@ -176,39 +189,52 @@ module.exports = class PandaPlayer {
                 get videoId from request
                 */
                 let videoID = req.substring(
-                    req.search('=') + 1, 
+                    req.search('=') + 1,
                     (req.search('&') == -1) ? req.length : req.search('&')
                 );
                 /*
-                return video data
+                get video data
                 */
-                let data = await yts({
+                data = await yts({
                     videoId: videoID
                 });
                 /*
-                add to queue
+                format video data
                 */
-                queue.push({
+                info = {
                     type: 'yt-video',
                     title: data.title,
                     url: data.url
-                });
+                }
             }
+            /*
+            request is a Youtube search query
+            */
+            else {
+                /*
+                get video data
+                */
+                data = await yts(req);
+                /*
+                format video data
+                */
+                info = {
+                    type: 'yt-video',
+                    title: data.all[0].title,
+                    url: data.all[0].url
+                }
+            }
+            /*
+            add to queue
+            */
+            queue.push(info);
+            chat.send(m.addToQueue.success(info));
         }
         catch (e) {
-            console.log(e.message);
-            chat.send(m.error);
-        }
-    }
-
-    /*
-    BOT searches for request in Youtube
-    */
-    searchYT(req) {
-        try {
-            
-        }
-        catch (e) {
+            /*
+            Youtube video is unavailable -> return
+            */
+            if (e == 'video unavailable') return chat.send(m.addToQueue.notFound);
             console.log(e.message);
             chat.send(m.error);
         }
@@ -217,9 +243,39 @@ module.exports = class PandaPlayer {
     /*
     BOT plays leading request on queue + time shift in milliseconds (default - 0)
     */
-    start(time = 0) {
+    async start(time = 0) {
         try {
-            
+            /*
+            BOT is paused -> return
+            */
+            if (isPaused) return chat.send(m.start.isPaused);
+            /*
+            queue is empty -> return
+            */
+            if (queue.length == 0) return chat.send(m.start.emptyQueue);
+            /*
+            create a new dispatcher
+            */
+            dispatcher = await connection.play(ytdl(queue[0].url), {
+                seek: Math.floor(time / 1000)
+            });
+            isPlaying = true;
+            chat.send(m.start.currentReq(queue[0]))
+            /*
+            create dispatcher listener ('finish')
+            */
+            dispatcher.once('finish', () => {
+                /*
+                BOT is not playing
+                reset seekTime
+                remove the request from queue
+                play next request
+                */
+                isPlaying = false;
+                seekTime = 0;
+                chat.send(m.start.endedReq(queue.shift()));
+                this.start();
+            });
         }
         catch (e) {
             console.log(e.message);
