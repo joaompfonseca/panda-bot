@@ -98,11 +98,17 @@ client.on('message', msg => {
             break;
         case 'game':
             let list = game;
-            if (args.length != 0) {
-                list = args.split(',');
-                list.forEach(g => g.trim());
-            }
+            /*
+            USER provides games to randomize
+            */
+            if (args.length != 0) list = args.split(',').map(g => g.trim()).filter(g => g.length > 0);
+            /*
+            Generate a random index
+            */
             let index = Math.floor(Math.random() * list.length);
+            /*
+            Send a random game
+            */
             chat.send(list[index]);
             break;
         case 'join':
