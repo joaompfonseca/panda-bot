@@ -20,7 +20,8 @@ const help = {
     'pause': 'para kit-kat',
     'resume': 'a festa continua',
     'skip': 'salto para a próximo som',
-    'clear': 'limpo o lixo na playlist'
+    'clear': 'limpo o lixo na playlist',
+    'queue': 'mostro o que está na playlist'
 };
 const game = [
     'Minecraft',
@@ -134,6 +135,9 @@ client.on('message', msg => {
             break;
         case 'clear':
             pandaPlayer.clear(msg);
+            break;
+        case 'queue':
+            pandaPlayer.queue(msg);
             break;
         default:
             msg.channel.send('Esse comando não existe. Tenta `pb.help` para não passares vergonha novamente.');

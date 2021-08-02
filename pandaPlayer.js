@@ -5,10 +5,6 @@ const ytdl = require('ytdl-core');
 //const msg = new Discord.Message();
 //const connection = new Discord.VoiceConnection();
 
-/**
- * fazer funcao para mostrar playlist
- */
-
 const m = {
     error: 'Ocorreu um erro ao executar o comando!',
     join: {
@@ -61,6 +57,11 @@ const m = {
         userNotVC: 'Não estás num canal de voz!',
         botNotVC: 'Não estou num canal de voz!',
         already: 'Não há nada para limpar!'
+    },
+    queue: {
+        emptyQueue: 'A minha playlist está vazia!',
+        currentReq: (info) => `Agora: \`${info.title}\`.`,
+        nextReq: (info) => `Depois: \`${info.title}\``
     }
 }
 
@@ -225,7 +226,7 @@ module.exports = class PandaPlayer {
                 let videoID;
                 if (req.includes('youtube.com/watch?v=')) {
                     videoID = req.substring(
-                        req.search('=') + 1, 
+                        req.search('=') + 1,
                         (req.search('&') == -1) ? req.length : req.search('&')
                     );
                 }
@@ -501,9 +502,37 @@ module.exports = class PandaPlayer {
             if (numClear == 0) return chat.send(m.clear.already);
             /*
             clear playlist
-            */            
+            */
             queue = (isPlaying) ? [queue[0]] : [];
             chat.send(m.clear.success(numClear));
+        }
+        catch (e) {
+            console.log(e.message);
+            chat.send(m.error);
+        }
+    }
+
+    /*
+    BOT shows playlist content
+    */
+    async queue(msg) {
+        try {
+            prevMsg = msg;
+            chat = msg.channel;
+            /*
+            queue is empty -> return
+            */
+            if (queue.length == 0) return chat.send(m.queue.emptyQueue);
+            /*
+            show first five requests in queue
+            */
+            let num = (queue.length > 5) ? 5 : queue.length;
+            let str = m.queue.currentReq(queue[0]);
+            for (let i = 1; i < num; i++)
+                str += '\n' + m.queue.nextReq(queue[i]);
+            if (queue.length > 5)
+                str += `\n+ \`${queue.length - num}\``;
+            chat.send(str);
         }
         catch (e) {
             console.log(e.message);
