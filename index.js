@@ -18,7 +18,8 @@ const help = {
     'play [...]': 'dou-te música',
     'pause': 'para kit-kat',
     'resume': 'a festa continua',
-    'skip': 'salto para a próximo som'
+    'skip': 'salto para a próximo som',
+    'clear': 'limpo o lixo na playlist'
 };
 const game = [
     'Minecraft',
@@ -129,6 +130,9 @@ client.on('message', msg => {
             break;
         case 'skip':
             pandaPlayer.skip(msg);
+            break;
+        case 'clear':
+            pandaPlayer.clear(msg);
             break;
         default:
             msg.channel.send('Esse comando não existe. Tenta `pb.help` para não passares vergonha novamente.');

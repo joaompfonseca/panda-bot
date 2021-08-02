@@ -5,6 +5,10 @@ const ytdl = require('ytdl-core');
 //const msg = new Discord.Message();
 //const connection = new Discord.VoiceConnection();
 
+/**
+ * fazer funcao para mostrar playlist
+ */
+
 const m = {
     error: 'Ocorreu um erro ao executar o comando!',
     join: {
@@ -30,24 +34,33 @@ const m = {
         isPaused: 'Estou em pausa!',
         emptyQueue: 'A minha playlist está vazia!',
         currentReq: (info) => `Agora: \`${info.title}\`.`,
-        endedReq: (info) => `Terminei: \`${info.title}\`.`
+        endedReq: (info) => `Terminou: \`${info.title}\`.`
     },
     pause: {
         success: 'Finalmente uma pausa, já não era sem tempo!',
+        userNotVC: 'Não estás num canal de voz!',
         botNotVC: 'Não estou num canal de voz!',
         notPlaying: 'Não posso parar se nem sequer comecei!',
         already: 'Eu já estou na minha pausa, por favor não me incomodes.'
     },
     resume: {
         success: 'Estou a tocar novamente!',
+        userNotVC: 'Não estás num canal de voz!',
         botNotVC: 'Não estou num canal de voz!',
         notPlaying: 'Não posso continuar se nem sequer comecei!',
         already: 'Eu já estou a tocar, não me chateies.'
     },
     skip: {
         success: (info) => `Saltei: \`${info.title}\`.`,
+        userNotVC: 'Não estás num canal de voz!',
         botNotVC: 'Não estou num canal de voz!',
-        notPlaying: 'Não posso saltar sem primeiro estar a tocar!',
+        notPlaying: 'Não posso saltar sem primeiro estar a tocar!'
+    },
+    clear: {
+        success: (num) => `Limpei \`${num}\` ${(num == 1) ? 'pedido' : 'pedidos'} da playlist.`,
+        userNotVC: 'Não estás num canal de voz!',
+        botNotVC: 'Não estou num canal de voz!',
+        already: 'Não há nada para limpar!'
     }
 }
 
@@ -95,7 +108,6 @@ module.exports = class PandaPlayer {
     BOT connects to VC
     */
     async connectTo(VC) {
-
         try {
             /*
             create a new connection
@@ -206,14 +218,20 @@ module.exports = class PandaPlayer {
             /*
             request is a Youtube video link
             */
-            if (req.includes('www.youtube.com/watch?v=')) {
+            if (req.includes('youtube.com/watch?v=') || req.includes('youtu.be/')) {
                 /*
                 get videoId from request
                 */
-                let videoID = req.substring(
-                    req.search('=') + 1,
-                    (req.search('&') == -1) ? req.length : req.search('&')
-                );
+                let videoID;
+                if (req.includes('youtube.com/watch?v=')) {
+                    videoID = req.substring(
+                        req.search('=') + 1, 
+                        (req.search('&') == -1) ? req.length : req.search('&')
+                    );
+                }
+                else if (req.includes('youtu.be/')) {
+                    videoID = req.substring(req.search('e/') + 2);
+                }
                 /*
                 get video data
                 */
@@ -228,6 +246,38 @@ module.exports = class PandaPlayer {
                     title: data.title,
                     url: data.url
                 }
+                /*
+                add video to queue
+                */
+                queue.push(info);
+                chat.send(m.addToQueue.success(info));
+            }
+            /*
+            request is a Youtube playlist
+            */
+            else if (req.includes('youtube.com/playlist?list=')) {
+                /*
+                get listId from request
+                */
+                let listID = req.substring(req.search('=') + 1);
+                /*
+                get playlist data
+                */
+                data = await yts({
+                    listId: listID
+                });
+                /*
+                add playlist videos to queue
+                */
+                for (let i = 0; i < data.videos.length; i++) {
+                    info = {
+                        type: 'yt-video',
+                        title: data.videos[i].title,
+                        url: 'https://youtube.com/watch?v=' + data.videos[i].videoId
+                    }
+                    queue.push(info);
+                }
+                chat.send(m.addToQueue.success(data));
             }
             /*
             request is a Youtube search query
@@ -242,15 +292,15 @@ module.exports = class PandaPlayer {
                 */
                 info = {
                     type: 'yt-video',
-                    title: data.all[0].title,
-                    url: data.all[0].url
+                    title: data.videos[0].title,
+                    url: data.videos[0].url
                 }
+                /*
+                add video to queue
+                */
+                queue.push(info);
+                chat.send(m.addToQueue.success(info));
             }
-            /*
-            add to queue
-            */
-            queue.push(info);
-            chat.send(m.addToQueue.success(info));
         }
         catch (e) {
             /*
@@ -312,8 +362,13 @@ module.exports = class PandaPlayer {
         try {
             prevMsg = msg;
             chat = msg.channel;
+            userVC = msg.member.voice.channel;
             /*
-            BOT is not in a VC
+            USER is not in a VC -> return
+            */
+            if (userVC == null) return chat.send(m.pause.userNotVC);
+            /*
+            BOT is not in a VC -> return
             */
             if (botVC == null) return chat.send(m.pause.botNotVC);
             /*
@@ -344,8 +399,13 @@ module.exports = class PandaPlayer {
         try {
             prevMsg = msg;
             chat = msg.channel;
+            userVC = msg.member.voice.channel;
             /*
-            BOT is not in a VC
+            USER is not in a VC -> return
+            */
+            if (userVC == null) return chat.send(m.resume.userNotVC);
+            /*
+            BOT is not in a VC -> return
             */
             if (botVC == null) return chat.send(m.resume.botNotVC);
             /*
@@ -380,8 +440,13 @@ module.exports = class PandaPlayer {
         try {
             prevMsg = msg;
             chat = msg.channel;
+            userVC = msg.member.voice.channel;
             /*
-            BOT is not in a VC
+            USER is not in a VC -> return
+            */
+            if (userVC == null) return chat.send(m.skip.userNotVC);
+            /*
+            BOT is not in a VC -> return
             */
             if (botVC == null) return chat.send(m.skip.botNotVC);
             /*
@@ -403,7 +468,44 @@ module.exports = class PandaPlayer {
             chat.send(m.skip.success(queue.shift()));
             this.start();
         }
-        catch {
+        catch (e) {
+            console.log(e.message);
+            chat.send(m.error);
+        }
+    }
+
+    /*
+    BOT clears playlist
+    */
+    async clear(msg) {
+        try {
+            prevMsg = msg;
+            chat = msg.channel;
+            userVC = msg.member.voice.channel;
+            /*
+            USER is not in a VC -> return
+            */
+            if (userVC == null) return chat.send(m.clear.userNotVC);
+            /*
+            BOT is not in a VC -> return
+            */
+            if (botVC == null) return chat.send(m.clear.botNotVC);
+            /*
+            determine number of requests to clear
+            */
+            let numClear = queue.length;
+            if (isPlaying) numClear -= 1;
+            /*
+            number of requests to clear is 0 -> return
+            */
+            if (numClear == 0) return chat.send(m.clear.already);
+            /*
+            clear playlist
+            */            
+            queue = (isPlaying) ? [queue[0]] : [];
+            chat.send(m.clear.success(numClear));
+        }
+        catch (e) {
             console.log(e.message);
             chat.send(m.error);
         }
