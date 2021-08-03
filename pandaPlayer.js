@@ -1,4 +1,3 @@
-const Discord = require('discord.js')
 const yts = require('yt-search');
 const ytdl = require('ytdl-core');
 
@@ -331,10 +330,6 @@ module.exports = class PandaPlayer {
     async start(time = 0) {
         try {
             /*
-            BOT is paused -> return
-            */
-            if (this.isPaused) return this.chat.send(m.start.isPaused);
-            /*
             queue is empty -> return
             */
             if (this.queue.length == 0) return this.chat.send(m.start.emptyQueue);
@@ -361,6 +356,13 @@ module.exports = class PandaPlayer {
                 this.chat.send(m.start.endedReq(this.queue.shift()));
                 this.start();
             });
+            /*
+            BOT is paused -> pause dispatcher
+            */
+            if (this.isPaused) {
+                this.dispatcher.pause();
+                this.chat.send(m.start.isPaused);
+            }
         }
         catch (e) {
             console.log(e.message);
