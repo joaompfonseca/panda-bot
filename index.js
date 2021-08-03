@@ -7,7 +7,7 @@ const mc = require('minecraft-server-util');
 
 const app = express();
 const client = new Discord.Client();
-const pandaPlayer = new PandaPlayer();
+const servers = {};
 const prefix = "pb.";
 const help = {
     'help': 'é trivial',
@@ -55,6 +55,16 @@ client.on('message', msg => {
 
     if (msg.author.bot) return;
     if (pfx != prefix) return;
+    
+    let serverID = msg.guild.id;
+    /*
+    server is not on servers -> add server to servers
+    */
+    if (!servers[serverID])
+        servers[serverID] = {
+            pandaPlayer: new PandaPlayer()
+        };
+    let server = servers[serverID];
 
     switch (cmd) {
         case 'help':
@@ -115,29 +125,29 @@ client.on('message', msg => {
             chat.send(list[index]);
             break;
         case 'join':
-            pandaPlayer.join(msg);
+            server.pandaPlayer.join(msg);
             break;
         case 'leave':
         case 'disconnect':
-            pandaPlayer.leave(msg);
+            server.pandaPlayer.leave(msg);
             break;
         case 'play':
-            pandaPlayer.play(msg, args);
+            server.pandaPlayer.play(msg, args);
             break;
         case 'pause':
-            pandaPlayer.pause(msg);
+            server.pandaPlayer.pause(msg);
             break;
         case 'resume':
-            pandaPlayer.resume(msg);
+            server.pandaPlayer.resume(msg);
             break;
         case 'skip':
-            pandaPlayer.skip(msg);
+            server.pandaPlayer.skip(msg);
             break;
         case 'clear':
-            pandaPlayer.clear(msg);
+            server.pandaPlayer.clear(msg);
             break;
         case 'queue':
-            pandaPlayer.queue(msg);
+            server.pandaPlayer.getQueue(msg);
             break;
         default:
             msg.channel.send('Esse comando não existe. Tenta `pb.help` para não passares vergonha novamente.');
