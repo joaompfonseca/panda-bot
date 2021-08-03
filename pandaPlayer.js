@@ -262,7 +262,7 @@ module.exports = class PandaPlayer {
                 add video to queue
                 */
                 this.queue.push(info);
-                chat.send(m.addToQueue.success(info));
+                this.chat.send(m.addToQueue.success(info));
             }
             /*
             request is a Youtube playlist
