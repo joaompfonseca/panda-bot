@@ -10,18 +10,22 @@ const client = new Discord.Client();
 const servers = {};
 const prefix = "pb.";
 const help = {
-    'help': 'é trivial',
-    'ping': 'digo pong',
-    'mc': 'status do servidor',
-    'game ?[...],[...]': 'sugiro-te um jogo',
-    'join': 'dj panda ao serviço',
-    'leave/disconnect': 'volto para o gabinete',
-    'play [...]': 'dou-te música',
-    'pause': 'para kit-kat',
-    'resume': 'a festa continua',
-    'skip': 'salto para a próximo som',
-    'clear': 'limpo o lixo na playlist',
-    'queue': 'mostro o que está na playlist'
+    general: {
+        'help': 'é trivial',
+        'ping': 'digo pong',
+        'mc': 'status do servidor',
+        'game ?[...],[...]': 'sugiro-te um jogo'
+    },
+    pandaPlayer: {
+        'join': 'dj panda ao serviço',
+        'leave/disconnect': 'volto para o gabinete',
+        'play [...]': 'dou-te música',
+        'pause': 'para kit-kat',
+        'resume': 'a festa continua',
+        'skip': 'salto para a próximo som',
+        'clear': 'limpo o lixo na playlist',
+        'queue': 'mostro o que está na playlist'
+    }
 };
 const game = [
     'Minecraft',
@@ -68,10 +72,25 @@ client.on('message', msg => {
 
     switch (cmd) {
         case 'help':
-            let output = '>>> **Comandos**';
-            for (let key in help) {
-                output += `\n\t\`${key}\` : ${help[key]}`;
-            }
+            /*
+            format help.general
+            */
+            let helpGeneral = '';
+            for (let key in help.general)
+                helpGeneral += `\n. \`${key}\` : ${help.general[key]}`;
+            /*
+            format help.pandaPlayer
+            */
+            let helpPandaPlayer = '';
+            for (let key in help.pandaPlayer)
+                helpPandaPlayer += `\n. \`${key}\` : ${help.pandaPlayer[key]}`;
+            /*
+            create embed
+            */
+            let output = new Discord.MessageEmbed()
+                .setTitle('Comandos')
+                .addField('Gerais', helpGeneral)
+                .addField('Panda Player', helpPandaPlayer);
             chat.send(output);
             break;
         case 'ping':
@@ -92,21 +111,21 @@ client.on('message', msg => {
                         playerNames.join(', ');
                     }
 
-                    let mcInfo = new Discord.MessageEmbed()
+                    let output = new Discord.MessageEmbed()
                         .setColor('#00FF00')
                         .setAuthor('ONLINE', 'https://www.freeiconspng.com/uploads/minecraft-icon-0.png')
                         .setTitle(`\`${data.host}\``)
                         .addField('Descrição', data.description.descriptionText, true)
                         .addField(`Jogadores (${data.onlinePlayers}/${data.maxPlayers})`, playerNames, true);
 
-                        chat.send(mcInfo);
+                    chat.send(output);
                 })
                 .catch(e => {
-                    let mcInfo = new Discord.MessageEmbed()
+                    let output = new Discord.MessageEmbed()
                         .setColor('#FF0000')
                         .setAuthor('OFFLINE', 'https://www.freeiconspng.com/uploads/minecraft-icon-0.png')
 
-                    chat.send(mcInfo);
+                    chat.send(output);
                 });
             break;
         case 'game':
