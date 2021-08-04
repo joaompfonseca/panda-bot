@@ -1,3 +1,5 @@
+require('@discordjs/opus');
+require('ffmpeg-static');
 const yts = require('yt-search');
 const ytdl = require('ytdl-core');
 
