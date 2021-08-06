@@ -2,6 +2,7 @@ require('@discordjs/opus');
 require('ffmpeg-static');
 const yts = require('yt-search');
 const ytdl = require('ytdl-core');
+const scdl = require('soundcloud-downloader').default;
 
 const m = {
     error: 'Ocorreu um erro ao executar o comando!',
@@ -230,9 +231,31 @@ module.exports = class PandaPlayer {
         try {
             let data, info;
             /*
+            request is a Soundcloud track link
+            */
+            if (req.includes('soundcloud.com/')) {
+                /*
+                get track data
+                */
+                data = await scdl.getInfo(req);
+                /*
+                format track data
+                */
+                info = {
+                    type: 'sc-track',
+                    title: `${data.user.username} - ${data.title}`,
+                    url: data.permalink_url
+                }
+                /*
+                add track to queue
+                */
+                this.queue.push(info);
+                this.chat.send(m.addToQueue.success(info));
+            }
+            /*
             request is a Youtube video link
             */
-            if (req.includes('youtube.com/watch?v=') || req.includes('youtu.be/')) {
+            else if (req.includes('youtube.com/watch?v=') || req.includes('youtu.be/')) {
                 /*
                 get videoId from request
                 */
@@ -318,9 +341,10 @@ module.exports = class PandaPlayer {
         }
         catch (e) {
             /*
-            Youtube video is unavailable -> return
+            Soundcloud track || Youtube video is unavailable -> return
             */
-            if (e == 'video unavailable') return this.chat.send(m.addToQueue.notFound);
+            if (e.message == 'Request failed with status code 404, could not find the song... it may be private - check the URL' 
+                || e == 'video unavailable') return this.chat.send(m.addToQueue.notFound);
             console.log(e.message);
             this.chat.send(m.error);
         }
@@ -336,10 +360,18 @@ module.exports = class PandaPlayer {
             */
             if (this.queue.length == 0) return this.chat.send(m.start.emptyQueue);
             /*
+            create a stream
+            */
+            let stream;
+            switch (this.queue[0].type) {
+                case 'sc-track': stream = await scdl.download(this.queue[0].url); break;
+                case 'yt-video': stream = ytdl(this.queue[0].url); break;
+            }
+            /*
             create a new dispatcher
             */
-            this.dispatcher = await this.connection.play(ytdl(this.queue[0].url), {
-                seek: Math.floor(time / 1000)
+            this.dispatcher = await this.connection.play(stream, {
+                    seek: Math.floor(time / 1000)
             });
             this.isPlaying = true;
             this.chat.send(m.start.currentReq(this.queue[0]))
