@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const PandaPlayer = require('../voice/pandaPlayer');
+const PandaPlayer = require('../voice/PandaPlayer');
 
 let guilds = {};
 

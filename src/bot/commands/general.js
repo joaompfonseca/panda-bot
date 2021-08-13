@@ -32,7 +32,7 @@ exports.ping = async (msg) => {
     let newMsg = await chat.send(pingJson.pinging);
     let ping = newMsg.createdTimestamp - msg.createdTimestamp;
     newMsg.delete();
-
+    
     return chat.send(pingJson.done(ping));
 }
 
@@ -69,7 +69,7 @@ exports.mc = async (msg) => {
  * @param {string} args 
  * @returns 
  */
-exports.game = (msg, args = '') => {
+exports.game = (msg, args) => {
     let chat = msg.channel;
     let list = args.split(',').map(g => g.trim()).filter(g => g.length > 0);
 

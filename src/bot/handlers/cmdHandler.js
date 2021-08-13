@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const { help, ping, mc, game, invalid } = require('../commands/general');
-const PandaPlayer = require('../voice/pandaPlayer');
+const PandaPlayer = require('../voice/PandaPlayer');
 
 /**
  * Handles BOT's commands
@@ -9,7 +9,7 @@ const PandaPlayer = require('../voice/pandaPlayer');
  * @param {string} cmd 
  * @param {string} args 
  */
-module.exports = (guild, msg, cmd, args) => {
+module.exports = (guild, msg, cmd, args = '') => {
     switch (cmd) {
         // General
         case 'help' :       help(msg);                          break;
