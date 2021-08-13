@@ -22,7 +22,6 @@ client.on('ready', () => {
 });
 
 client.on('message', msg => {
-    let chat = msg.channel;
     let text = msg.content.trim();
     let argsPos = text.search("\\s");
 
