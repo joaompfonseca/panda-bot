@@ -2,11 +2,11 @@
   "name": "panda-bot",
   "version": "1.0.0",
   "description": "",
-  "main": "./build/index.js",
+  "main": "./build/start.js",
   "type": "module",
   "scripts": {
     "start:build": "tsc -w",
-    "start:run": "nodemon build/app.js",
+    "start:run": "nodemon build/start.js",
     "start": "concurrently npm:start:*"
   },
   "author": "",
