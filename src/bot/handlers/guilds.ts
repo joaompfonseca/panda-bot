@@ -1,4 +1,4 @@
-import { PandaGuilds } from '../interfaces.js';
+import { PandaGuild, PandaGuilds } from '../interfaces.js';
 import { PandaPlayer } from '../commands/PandaPlayer.js';
 
 let guilds: PandaGuilds = {};
@@ -8,7 +8,7 @@ let guilds: PandaGuilds = {};
  * @param guildId 
  * @returns 
  */
-export function guildHandler(guildId: string) {
+export function guildHandler(guildId: string): PandaGuild {
     if (!guilds[guildId])
         guilds[guildId] = { pandaPlayer: new PandaPlayer() }
     return guilds[guildId];
