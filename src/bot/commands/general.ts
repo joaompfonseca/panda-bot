@@ -29,7 +29,7 @@ export function help(chat: TextBasedChannels): void {
  */
 export async function ping(chat: TextBasedChannels, time: number): Promise<void> {
     let msg = await chat.send(mPing.pinging);
-    let ping = time - msg.createdTimestamp;
+    let ping = msg.createdTimestamp - time;
 
     msg.delete();
 
