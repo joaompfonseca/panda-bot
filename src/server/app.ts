@@ -1,6 +1,10 @@
 import express from 'express'
 
-export function app() {
+/**
+ * Initializes the server.
+ * @returns 
+ */
+export function app(): void {
     const app = express();
 
     app.get('/', (req, res) => {
@@ -9,4 +13,6 @@ export function app() {
     app.listen(3000, () => {
         console.log('Server is running!');
     });
+
+    return;
 }
