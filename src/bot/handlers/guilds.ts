@@ -1,7 +1,7 @@
 import { PandaGuilds } from '../interfaces.js';
 import { PandaPlayer } from '../commands/PandaPlayer.js';
 
-let guilds: PandaGuilds;
+let guilds: PandaGuilds = {};
 
 /**
  * Handles Bot's guilds.
