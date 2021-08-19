@@ -1,4 +1,4 @@
-import { TextBasedChannels, MessageEmbed, TextChannel } from 'discord.js';
+import { TextBasedChannels, MessageEmbed } from 'discord.js';
 import msu from 'minecraft-server-util';
 import { mcServer } from '../bot-config.js';
 import { mError, mHelp, mPing, mGame } from './messages.js';
