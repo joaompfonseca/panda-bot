@@ -29,17 +29,17 @@ export interface PandaAudio {
     seekTime: number;
     vcId: string | null;
 
-    join(chat: TextBasedChannels, vcId: string | null): Promise<void>;
-    connectTo(vcId: string): Promise<void>;
-    leave(chat: TextBasedChannels): Promise<void>;
-    play(): Promise<void>;
-    addToQueue(): Promise<void>;
-    start(): Promise<void>;
-    pause(): Promise<void>;
-    resume(): Promise<void>;
-    skip(): Promise<void>;
-    clear(): Promise<void>;
-    getQueue(): Promise<void>;
+    join(chat: TextBasedChannels, vcId: string | null): void;
+    connectTo(vcId: string): void;
+    leave(chat: TextBasedChannels): void;
+    play(): void;
+    addToQueue(): void;
+    start(): void;
+    pause(): void;
+    resume(): void;
+    skip(): void;
+    clear(): void;
+    getQueue(): void;
 }
 
 /* PandaGuild */

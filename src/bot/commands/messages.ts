@@ -45,11 +45,11 @@ export const mPanda = {
         userNotVC: 'Como é que queres que eu entre se não estás num canal de voz?'
     },
     connectTo: {
-        success: (vcId: string) => `Conectado a <#${vcId}>.`
+        ready: (vcId: string) => `Conectado a <#${vcId}>.`,
+        disconnected: (vcId: string) => `Desconectado de <#${vcId}>.`
     },
     leave: {
-        botNotVC: 'Como é que queres que eu saia se não estou num canal de voz?',
-        success: (vcId: string) => `Desconectado de <#${vcId}>.`
+        botNotVC: 'Como é que queres que eu saia se não estou num canal de voz?'
     },
     play: {
         emptyQuery: 'Nem sei o que te faço, então pedes-me para tocar nada?',

@@ -21,8 +21,8 @@ export function cmdHandler(cmd: string, args: string, guild: PandaGuild, chat: T
         case 'game' :       game(chat, args);                   break;
         // Panda Player
         case 'join':        guild.pandaPlayer.join(chat, vcId); break;
-        //case 'leave':
-        //case 'disconnect':  guild.pandaPlayer.leave(msg);       break;
+        case 'leave':
+        case 'disconnect':  guild.pandaPlayer.leave(chat);       break;
         //case 'play':        guild.pandaPlayer.play(msg, args);  break;
         //case 'pause':       guild.pandaPlayer.pause(msg);       break;
         //case 'resume':      guild.pandaPlayer.resume(msg);      break;

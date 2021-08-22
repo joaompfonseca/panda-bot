@@ -34,16 +34,16 @@ export class PandaPlayer implements PandaAudio {
      * @param vcId 
      * @returns 
      */
-    async join(chat: TextBasedChannels, vcId: string | null): Promise<void> {
+    join(chat: TextBasedChannels, vcId: string | null): void {
         try {
             this.chat = chat;
             /* User is not in a vc -> return */
-            if (vcId == null) { chat.send(mPanda.join.userNotVC); return; }
+            if (vcId == null) { this.chat.send(mPanda.join.userNotVC); return; }
             /* Bot is in the same vc as User -> return */
-            if (this.vcId == vcId) { chat.send(mPanda.join.already(this.vcId)); return; }
+            if (this.vcId == vcId) { this.chat.send(mPanda.join.already(this.vcId)); return; }
 
             /* Bot is in a different vc of User -> leave current vc */
-            if (this.vcId != null && this.vcId != vcId) await this.leave(chat);
+            if (this.vcId != null && this.vcId != vcId) this.leave(chat);
             /* Create a connection */
             this.connectTo(vcId); return;
         }
@@ -54,35 +54,37 @@ export class PandaPlayer implements PandaAudio {
     }
 
     /**
-     * Bot connects to vc
+     * Bot connects to vc.
      * @param vcId 
-     * @returns
+     * @returns 
      */
-    async connectTo(vcId: string): Promise<void> {
+    connectTo(vcId: string): void {
         try {
             /* Create a connection */
             this.connection = joinVoiceChannel({ channelId: vcId, guildId: this.guildId, adapterCreator: this.adapterCreator });
-            /* Create connection listeners */
-            this.connection
-                /* Bot is connected to the vc */
-                .on(VoiceConnectionStatus.Ready, () => {
-                    this.vcId = vcId;
-                    this.chat.send(mPanda.connectTo.success(this.vcId));
+            /* Bot is connected */
+            this.connection.once(VoiceConnectionStatus.Ready, () => {
+                this.vcId = vcId;
+                this.chat.send(mPanda.connectTo.ready(this.vcId!));
+
+                /* Bot is disconnected */
+                this.connection!.once(VoiceConnectionStatus.Disconnected, () => {
+                    this.chat.send(mPanda.connectTo.disconnected(this.vcId!));
+                    /* Save potencial vc to connect to */
+                    let vcId = this.connection!.joinConfig.channelId;
+                    /* Destroy connection */
+                    this.connection!.destroy();
+
                     /* Bot is moved to another vc */
-                    this.connection!.on(VoiceConnectionStatus.Connecting, () => {
-                        /* Save new vcId before destroying connection */
-                        let vcId = this.connection!.joinConfig.channelId!;
-                        //this.connection!.destroy();
-                        /* Create a new connection */
-                        this.connectTo(vcId);
-                    })
-                })
-                /* Bot is disconnected from the vc */
-                .on(VoiceConnectionStatus.Disconnected, () => {
-                    this.leave(this.chat);
-                })
-            /* Bot is playing -> continue to play where it left */
-            if (this.isPlaying) this.start(this.seekTime);
+                    if (vcId != null && vcId != this.vcId) { this.connectTo(vcId); return; }
+                    /* Clear vars */
+                    this.connection = null;
+                    this.vcId = null; return;
+                });
+
+                /* Bot is playing -> continue to play where it left */
+                //if (this.isPlaying) this.start(this.seekTime);
+            });
             return;
         }
         catch (e) {
@@ -91,39 +93,19 @@ export class PandaPlayer implements PandaAudio {
         }
     }
 
-
-    async leave(chat: TextBasedChannels): Promise<void> {
+    /**
+     * Bot leaves current vc
+     * @param chat 
+     * @returns 
+     */
+    leave(chat: TextBasedChannels): void {
         try {
             this.chat = chat;
-            /* User is not in a vc -> return */
-            if (this.vcId == null) { chat.send(mPanda.leave.botNotVC); return };
-            /* Save seekTime */
-            //if (this.isPlaying) this.seekTime += this.dispatcher.streamTime;
-            //         this.prevMsg = msg;
-            //         this.chat = msg.channel;
-            //         /*
-            //         BOT is not in a VC -> return
-            //         */
-            //         if (this.botVC == null) return this.chat.send(m.leave.botNotVC);
-            //         /*
-            //         save seekTime
-            //         remove connection listeners ('disconnect' and 'reconnecting')
-            //         remove dispatcher listener ('finish')
-            //         */
-            //         if (this.isPlaying) this.seekTime += this.dispatcher.streamTime;
-            //         if (this.connection != null) this.connection.removeAllListeners();
-            //         if (this.dispatcher != null) this.dispatcher.removeAllListeners();
-            //         /*
-            //         leave VC
-            //         */
-            //         this.botVC.leave();
-            //         await this.chat.send(m.leave.success(this.botVC));
-            //         this.botVC = null;
-            //     }
-            //     catch (e) {
-            //         console.log(e.message);
-            //         this.chat.send(m.error);
-            //     }
+            /* Bot is not in a vc -> return */
+            if (this.vcId == null) { this.chat.send(mPanda.leave.botNotVC); return };
+
+            /* Leave vc */
+            this.connection!.disconnect(); return;
         }
         catch (e) {
             console.warn(e.message);
@@ -131,14 +113,14 @@ export class PandaPlayer implements PandaAudio {
         }
     }
 
-    async play(): Promise<void> { }
-    async addToQueue(): Promise<void> { }
-    async start(time: number = 0): Promise<void> { }
-    async pause(): Promise<void> { }
-    async resume(): Promise<void> { }
-    async skip(): Promise<void> { }
-    async clear(): Promise<void> { }
-    async getQueue(): Promise<void> { }
+    play(): void { }
+    addToQueue(): void { }
+    start(time: number = 0): void { }
+    pause(): void { }
+    resume(): void { }
+    skip(): void { }
+    clear(): void { }
+    getQueue(): void { }
 }
 
 // /*
