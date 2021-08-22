@@ -12,7 +12,6 @@ export function app(): void {
     });
     app.listen(3000, () => {
         console.log('Server is running!');
-    });
-
+    }); 
     return;
 }

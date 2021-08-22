@@ -6,5 +6,5 @@ import { Client } from 'discord.js';
  * @returns
  */
 export function ready(client: Client): void {
-    console.log(`Logged in as ${client.user.tag}!`); return;
+    console.log(`Logged in as ${client.user!.tag}!`); return;
 }

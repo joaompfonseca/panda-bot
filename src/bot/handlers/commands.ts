@@ -1,7 +1,6 @@
-import { TextBasedChannels, VoiceChannel, StageChannel } from 'discord.js';
-import { PandaGuild } from '../interfaces.js'
+import { TextBasedChannels } from 'discord.js';
+import { PandaGuild } from '../interfaces.js';
 import { help, ping, mc, game, unknown } from '../commands/general.js';
-import { PandaPlayer } from '../commands/PandaPlayer.js'
 
 /**
  * Handles Bot's commands.
@@ -9,9 +8,11 @@ import { PandaPlayer } from '../commands/PandaPlayer.js'
  * @param args 
  * @param guild 
  * @param chat 
- * @param vc 
+ * @param time 
+ * @param vcId 
+ * @returns 
  */
-export function cmdHandler(cmd: string, args: string, guild: PandaGuild, chat: TextBasedChannels, vc: VoiceChannel | StageChannel, time: number): void {
+export function cmdHandler(cmd: string, args: string, guild: PandaGuild, chat: TextBasedChannels, time: number, vcId: string | null): void {
     switch (cmd) {
         // General
         case 'help' :       help(chat);                         break;
@@ -19,7 +20,7 @@ export function cmdHandler(cmd: string, args: string, guild: PandaGuild, chat: T
         case 'mc'   :       mc(chat);                           break;
         case 'game' :       game(chat, args);                   break;
         // Panda Player
-        //case 'join':        guild.pandaPlayer.join(msg);        break;
+        case 'join':        guild.pandaPlayer.join(chat, vcId); break;
         //case 'leave':
         //case 'disconnect':  guild.pandaPlayer.leave(msg);       break;
         //case 'play':        guild.pandaPlayer.play(msg, args);  break;

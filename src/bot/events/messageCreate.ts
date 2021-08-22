@@ -18,10 +18,10 @@ export function messageCreate(msg: Message): void {
 
     const cmd = (argsPos == -1) ? content.substring(prefix.length) : content.substring(prefix.length, argsPos);
     const args = (argsPos == -1) ? '' : content.substring(argsPos).trimStart();
-    const guild = guildHandler(msg.guildId);
+    const guild = guildHandler(msg.guildId!, msg.channel, msg.guild!.voiceAdapterCreator);
     const chat = msg.channel;
-    const vc = msg.member.voice.channel;
     const time = msg.createdTimestamp;
+    const vcId = msg.member!.voice.channelId;
 
-    cmdHandler(cmd, args, guild, chat, vc, time); return;
+    cmdHandler(cmd, args, guild, chat, time, vcId); return;
 }

@@ -9,12 +9,10 @@ import { messageCreate } from './events/messageCreate.js';
  */
 export function client(): void {
     const client = new Client({
-        intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]
+        intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES]
     });
 
     client.on('ready', () => ready(client));
     client.on('messageCreate', msg => messageCreate(msg));
-    client.login(process.env.TOKEN);
-
-    return;
+    client.login(process.env.TOKEN); return;
 }

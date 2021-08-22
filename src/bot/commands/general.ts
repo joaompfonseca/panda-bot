@@ -46,12 +46,12 @@ export async function mc(chat: TextBasedChannels): Promise<void> {
 
     try {
         let data = await msu.status(mcServer);
-        let playerNames = (data.onlinePlayers > 0) ? data.samplePlayers.map(p => p.name).join(', ') : '_ _';
+        let playerNames = (data.onlinePlayers! > 0) ? data.samplePlayers!.map(p => p.name).join(', ') : '_ _';
 
         embed.setColor('#00FF00')
             .setAuthor('ONLINE', 'https://i.imgur.com/JytGYe6.png')
             .setTitle(`\`${data.host}\``)
-            .addField('Descrição', data.description.descriptionText, true)
+            .addField('Descrição', data.description!.descriptionText, true)
             .addField(`Jogadores (${data.onlinePlayers}/${data.maxPlayers})`, playerNames, true);
     }
     catch (e) {
