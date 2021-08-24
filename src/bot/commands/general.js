@@ -1,3 +1,4 @@
+require('dotenv').config();
 const Discord = require('discord.js');
 const mc = require('minecraft-server-util');
 const { helpJson, pingJson, gameJson, invalidJson } = require('./messages');
@@ -46,7 +47,7 @@ exports.mc = async (msg) => {
     let embed = new Discord.MessageEmbed();
 
     try {
-        let data = await mc.status('grelo.ddns.net');
+        let data = await mc.status(process.env.MCSERVER);
         let playerNames = (data.onlinePlayers > 0) ? data.samplePlayers.map(p => p.name).join(', ') : '_ _';
 
         embed.setColor('#00FF00')
