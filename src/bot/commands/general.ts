@@ -1,6 +1,6 @@
 import { TextBasedChannels, MessageEmbed } from 'discord.js';
 import msu from 'minecraft-server-util';
-import { mcServer } from '../bot-config.js';
+import dotenv from 'dotenv'; dotenv.config();
 import { mError, mHelp, mPing, mGame } from './messages.js';
 
 /**
@@ -45,7 +45,7 @@ export async function mc(chat: TextBasedChannels): Promise<void> {
     let embed = new MessageEmbed();
 
     try {
-        let data = await msu.status(mcServer);
+        let data = await msu.status(process.env.MCSERVER!);
         let playerNames = (data.onlinePlayers! > 0) ? data.samplePlayers!.map(p => p.name).join(', ') : '_ _';
 
         embed.setColor('#00FF00')

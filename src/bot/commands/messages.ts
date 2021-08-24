@@ -1,5 +1,5 @@
-import { PlaylistMetadataResult } from "yt-search";
-import { PandaRequest } from "../interfaces";
+import { PlaylistMetadataResult } from 'yt-search';
+import { PandaRequest } from '../interfaces';
 
 export const mError = {
     invalidArgs: 'Argumentos inválidos!',
