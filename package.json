@@ -1,6 +1,6 @@
 {
   "name": "panda-bot",
-  "version": "1.0.0",
+  "version": "0.0.0-12.5.3",
   "description": "",
   "main": "./src/index.js",
   "scripts": {
