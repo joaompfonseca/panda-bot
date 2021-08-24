@@ -2,9 +2,9 @@
 
 ## Description
 Bot that can play youtube audio and soundcloud tracks over Discord voice channels.
-- Written in JavaScript.
-- Messages are in `Portuguese`, but can be changed [here (General)](https://github.com/joaompfonseca/panda-bot/blob/master/src/bot/commands/messages.js) 
-               and [here (PandaPlayer)](https://github.com/joaompfonseca/panda-bot/blob/master/src/bot/voice/pandaPlayer.js).
+- Written in JavaScript (node v16.6.2).
+- Messages are in `Portuguese`, but can be changed [here](https://github.com/joaompfonseca/panda-bot/blob/master/src/bot/commands/messages.js) (General)
+               and [here](https://github.com/joaompfonseca/panda-bot/blob/master/src/bot/voice/pandaPlayer.js) (PandaPlayer).
 
 ## Commands
 - General: `help`, `ping`, `mc`, `game`
