@@ -1,6 +1,6 @@
 {
   "name": "panda-bot",
-  "version": "0.0.0-12.5.3",
+  "version": "0.0.0-13.1.0",
   "description": "",
   "main": "./build/start.js",
   "type": "module",
