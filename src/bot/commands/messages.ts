@@ -1,3 +1,4 @@
+import { PlaylistMetadataResult } from "yt-search";
 import { PandaRequest } from "../interfaces";
 
 export const mError = {
@@ -18,7 +19,7 @@ export const mHelp: { [category: string]: { [term: string]: string } } = {
         'leave/disconnect': 'volto para o gabinete',
         'play [..]': 'dou-te música',
         pause: 'para kit-kat',
-        resume: 'a festa continua',
+        'unpause/resume': 'a festa continua',
         skip: 'salto para a próximo som',
         clear: 'limpo o lixo na playlist',
         queue: 'mostro o que está na playlist'
@@ -42,10 +43,11 @@ export const mGame = [
 export const mPanda = {
     join: {
         already: (vcId: string) => `Já estou conectado a <#${vcId}>! Não tens olhos na vista?`,
+        paused: 'Estou em pausa!',
         userNotVC: 'Como é que queres que eu entre se não estás num canal de voz?'
     },
     connectTo: {
-        ready: (vcId: string) => `Conectado a <#${vcId}>.`,
+        connected: (vcId: string) => `Conectado a <#${vcId}>.`,
         disconnected: (vcId: string) => `Desconectado de <#${vcId}>.`
     },
     leave: {
@@ -56,27 +58,26 @@ export const mPanda = {
         userNotVC: 'Não me podes pedir discos antes de entrares num canal de voz!'
     },
     addToQueue: {
+        invalidUrl: 'O link que me forneceste é inválido!',
         notFound: 'Não encontrei nada que correspondesse ao teu pedido.',
-        success: (req: PandaRequest) => `Adicionei \`${req.title}\` à playlist.`
+        success: (req: PandaRequest | PlaylistMetadataResult) => `Adicionei \`${req.title}\` à playlist.`
     },
     start: {
-        currentReq: (req: PandaRequest) => `Agora: \`${req.title}\`.`,
-        isPaused: 'Estou em pausa!',
-        emptyQueue: 'A minha playlist está vazia!',
-        endedReq: (req: PandaRequest) => `Terminou: \`${req.title}\`.`
+        empty: 'A minha playlist está vazia!',
+        ended: (req: PandaRequest) => `Terminou: \`${req.title}\`.`,
+        paused: 'Estou em pausa!',
+        playing: (req: PandaRequest) => `Agora: \`${req.title}\`.`
     },
     pause: {
         already: 'Eu já estou na minha pausa, não me chateies.',
         botNotVC: 'Não estou num canal de voz!',
         notPlaying: 'Não posso parar se nem sequer comecei!',
-        success: 'Finalmente uma pausa, já não era sem tempo!',
         userNotVC: 'Não estás num canal de voz!'
     },
     resume: {
         already: 'Eu já estou a tocar, não me chateies.',
         botNotVC: 'Não estou num canal de voz!',
         notPlaying: 'Não posso continuar se nem sequer comecei!',
-        success: 'Estou a tocar novamente!',
         userNotVC: 'Não estás num canal de voz!'
     },
     skip: {
@@ -92,8 +93,8 @@ export const mPanda = {
         userNotVC: 'Não estás num canal de voz!'
     },
     getQueue: {
-        currentReq: (req: PandaRequest) => `Agora: \`${req.title}\`.`,
-        emptyQueue: 'A minha playlist está vazia!',
-        nextReq: (req: PandaRequest) => `Depois: \`${req.title}\``
+        playing: (req: PandaRequest) => `Agora: \`${req.title}\`.`,
+        empty: 'A minha playlist está vazia!',
+        next: (req: PandaRequest) => `Depois: \`${req.title}\``
     }
 }

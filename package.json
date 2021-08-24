@@ -20,13 +20,15 @@
     "express": "^4.17.1",
     "ffmpeg-static": "^4.4.0",
     "minecraft-server-util": "^3.5.2",
-    "soundcloud-downloader": "^1.0.0",
+    "scdl-core": "^1.0.12",
+    "tweetnacl": "^1.0.3",
     "yt-search": "^2.10.0",
     "ytdl-core": "^4.9.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",
     "@types/node": "^16.6.1",
+    "@types/yt-search": "^2.3.2",
     "ts-node": "^10.2.0",
     "typescript": "^4.3.5"
   }
