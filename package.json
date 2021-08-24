@@ -2,22 +2,34 @@
   "name": "panda-bot",
   "version": "0.0.0-12.5.3",
   "description": "",
-  "main": "./src/index.js",
+  "main": "./build/start.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:build": "tsc -w",
+    "start:run": "nodemon build/start.js",
+    "start": "concurrently npm:start:*"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@discordjs/opus": "github:discordjs/opus",
+    "@discordjs/voice": "^0.6.0",
     "axios": "^0.21.1",
-    "discord.js": "^12.5.3",
+    "discord.js": "^13.1.0",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "ffmpeg-static": "^4.4.0",
     "minecraft-server-util": "^3.5.2",
-    "soundcloud-downloader": "^1.0.0",
+    "scdl-core": "^1.0.12",
+    "tweetnacl": "^1.0.3",
     "yt-search": "^2.10.0",
     "ytdl-core": "^4.9.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^16.6.1",
+    "@types/yt-search": "^2.3.2",
+    "ts-node": "^10.2.0",
+    "typescript": "^4.3.5"
   }
 }
