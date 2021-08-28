@@ -1,4 +1,4 @@
-# Panda Bot (discord.js-13.1.0)
+# Panda Bot (discord.js v13.1.0)
 
 ## Description
 Bot that can play youtube audio and soundcloud tracks over Discord voice channels.
