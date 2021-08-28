@@ -1,6 +1,6 @@
 {
   "name": "panda-bot",
-  "version": "0.0.0-13.1.0",
+  "version": "0.0.1-13.1.0",
   "description": "",
   "main": "./build/start.js",
   "type": "module",
@@ -9,7 +9,7 @@
     "start:run": "nodemon build/start.js",
     "start": "concurrently npm:start:*"
   },
-  "author": "",
+  "author": "João Fonseca",
   "license": "ISC",
   "dependencies": {
     "@discordjs/opus": "^0.5.3",
