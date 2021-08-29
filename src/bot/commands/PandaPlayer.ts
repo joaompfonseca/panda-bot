@@ -217,9 +217,9 @@ export class PandaPlayer implements PandaAudio {
             return;
         }
         catch (e) {
-            let msg: string = e.message;
+            let msg: string = (e.message == undefined) ? e : e.message;
             /* Invalid Url -> return */
-            if (msg.startsWith('Video id') || msg.startsWith('No video id found')) { this.chat.send(mPanda.addToQueue.invalidUrl); return; }
+            if (msg.startsWith('Invalid url') || msg.startsWith('No video id found') || msg.startsWith('Video id')) { this.chat.send(mPanda.addToQueue.invalidUrl); return; }
             /* Not Found -> return */
             if (msg.startsWith('Request failed') || msg.startsWith('video unavailable')) { this.chat.send(mPanda.addToQueue.notFound); return; }
             /* Other Error */
