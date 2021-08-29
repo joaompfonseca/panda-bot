@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [0.0.0] - 2021-08-28
+## [0.0.0] - 2021-08-29
 ### Added
 - Author to `package.json`.
 - New `CHANGELOG.md` to document all notable changes to this project.
