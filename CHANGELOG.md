@@ -1,12 +1,17 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [0.1.0] - 2021-08-29
+## [0.1.0] - 2021-08-31
+### Added
+- New messages for error filtering.
+
 ### Changed
 - Now using youtube-scrapper and ytdl-core-discord instead of yt-search and ytdl-core.
+- Now `skip` command checks for empty queue instead of player status.
 
 ### Fixed
 - Error message being undefined when requesting an invalid SoundCloud track link.
+- Age restricted videos not being skipped and removed from queue.
 
 ## [0.0.0] - 2021-08-29
 ### Added
