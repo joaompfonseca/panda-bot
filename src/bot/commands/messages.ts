@@ -82,7 +82,7 @@ export const mPanda = {
     },
     skip: {
         botNotVC: 'Não estou num canal de voz!',
-        notPlaying: 'Não posso saltar sem primeiro estar a tocar!',
+        empty: 'A minha playlist está vazia!',
         success: (req: PandaRequest) => `Saltei: \`${req.title}\`.`,
         userNotVC: 'Não estás num canal de voz!'
     },
