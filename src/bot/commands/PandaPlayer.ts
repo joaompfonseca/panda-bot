@@ -262,6 +262,13 @@ export class PandaPlayer implements PandaAudio {
             return;
         }
         catch (e) {
+            let msg: string = (e.message == undefined) ? e : e.message;
+            /* Age Restricted -> return */
+            if (msg.startsWith('Status code: 410')) {
+                this.chat.send(mPanda.start.ageRestricted);
+                this.skip(this.chat, this.vcId); return;
+            }
+            /* Other Error */
             console.warn(e.message);
             this.chat.send(mError.executeCmd); return;
         }
