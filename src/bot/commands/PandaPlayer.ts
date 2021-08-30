@@ -168,8 +168,12 @@ export class PandaPlayer implements PandaAudio {
             }
             /* Request is a Youtube video (link) */
             else if (req.includes('youtube.com/watch?v=') || req.includes('youtu.be/')) {
+                /* Get videoId */
+                let videoId: string;
+                if (req.includes('youtube.com/watch?v=')) { videoId = req.substring(req.search('=') + 1, (req.search('&') == -1) ? req.length : req.search('&')); }
+                if (req.includes('youtu.be/')) { videoId = req.substring(req.search('e/') + 2); }
                 /* Get data */
-                data = await scrapper.getVideoInfo(req);
+                data = await scrapper.getVideoInfo(videoId!);
                 /* Format data */
                 pandaRequest = {
                     title: data.details.title,
@@ -217,9 +221,13 @@ export class PandaPlayer implements PandaAudio {
         catch (e) {
             let msg: string = (e.message == undefined) ? e : e.message;
             /* Invalid Url -> return */
-            if (msg.startsWith(`Cannot read property 'videoId' of undefined`)) { this.chat.send(mPanda.addToQueue.invalidUrl); return; }
+            if (msg.startsWith('Invalid url') ||
+                msg.startsWith('Invalid URL') ||
+                msg.startsWith('Video id') ||
+                msg.startsWith(`Cannot read property 'videoId' of undefined`)) { this.chat.send(mPanda.addToQueue.invalidUrl); return; }
             /* Unavailable -> return */
-            if (msg.startsWith('adaptationSet.Representation is not iterable')) { this.chat.send(mPanda.addToQueue.unavailable); return; }
+            if (msg.startsWith('Unexpected token ;') ||
+                msg.startsWith('adaptationSet.Representation is not iterable')) { this.chat.send(mPanda.addToQueue.unavailable); return; }
             /* Other Error */
             console.warn(msg);
             this.chat.send(mError.executeCmd); return;
