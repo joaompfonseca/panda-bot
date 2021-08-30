@@ -1,8 +1,8 @@
 import { TextBasedChannels } from 'discord.js';
 import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from '@discordjs/voice';
 import { SoundCloud, Track as Soundcloud_Track } from 'scdl-core'; const scdl = new SoundCloud(); scdl.connect();
-import yts, { PlaylistMetadataResult as Youtube_Playlist, SearchResult as Youtube_Query, VideoMetadataResult as Youtube_Video } from 'yt-search';
-import ytdl from 'ytdl-core';
+import scrapper, { YoutubeVideo as Youtube_Video, Playlist as Youtube_Playlist, YoutubeSearchResults as Youtube_Query } from 'youtube-scrapper';
+import ytdl from 'ytdl-core-discord';
 import { PandaAudio, PandaRequest, PandaRequestTypes } from '../interfaces.js';
 import { mError, mPanda } from './messages.js';
 
@@ -168,15 +168,13 @@ export class PandaPlayer implements PandaAudio {
             }
             /* Request is a Youtube video (link) */
             else if (req.includes('youtube.com/watch?v=') || req.includes('youtu.be/')) {
-                /* Get videoId */
-                let videoId = ytdl.getURLVideoID(req);
                 /* Get data */
-                data = await yts({ videoId: videoId });
+                data = await scrapper.getVideoInfo(req);
                 /* Format data */
                 pandaRequest = {
-                    title: data.title,
+                    title: data.details.title,
                     type: PandaRequestTypes.YOUTUBE_VIDEO,
-                    url: data.url
+                    url: data.details.url
                 };
                 /* Add request to queue */
                 this.queue.push(pandaRequest);
@@ -187,13 +185,13 @@ export class PandaPlayer implements PandaAudio {
                 /* Get listId */
                 let listId = req.substring(req.search('=') + 1);
                 /* Get data */
-                data = await yts({ listId: listId });
+                data = await scrapper.getPlaylistInfo(listId);
                 /* Format data */
-                for (let i = 0; i < data.videos.length; i++) {
+                for (let i = 0; i < data.tracks.length; i++) {
                     pandaRequest = {
-                        title: data.videos[i].title,
+                        title: data.tracks[i].title,
                         type: PandaRequestTypes.YOUTUBE_VIDEO,
-                        url: `https://youtube.com/watch?v=${data.videos[i].videoId}`
+                        url: `https://youtube.com/watch?v=${data.tracks[i].id}`
                     };
                     /* Add request to queue */
                     this.queue.push(pandaRequest);
@@ -203,12 +201,12 @@ export class PandaPlayer implements PandaAudio {
             /* Request is a Youtube video (query) */
             else {
                 /* Get data */
-                data = await yts(req);
+                data = await scrapper.search(req);
                 /* Format data */
                 pandaRequest = {
                     title: data.videos[0].title,
                     type: PandaRequestTypes.YOUTUBE_VIDEO,
-                    url: data.videos[0].url
+                    url: `https://youtube.com/watch?v=${data.videos[0].id}`
                 }
                 /* Add request to queue */
                 this.queue.push(pandaRequest);
@@ -219,9 +217,9 @@ export class PandaPlayer implements PandaAudio {
         catch (e) {
             let msg: string = (e.message == undefined) ? e : e.message;
             /* Invalid Url -> return */
-            if (msg.startsWith('Invalid url') || msg.startsWith('No video id found') || msg.startsWith('Video id')) { this.chat.send(mPanda.addToQueue.invalidUrl); return; }
-            /* Not Found -> return */
-            if (msg.startsWith('Request failed') || msg.startsWith('video unavailable')) { this.chat.send(mPanda.addToQueue.notFound); return; }
+            if (msg.startsWith(`Cannot read property 'videoId' of undefined`)) { this.chat.send(mPanda.addToQueue.invalidUrl); return; }
+            /* Unavailable -> return */
+            if (msg.startsWith('adaptationSet.Representation is not iterable')) { this.chat.send(mPanda.addToQueue.unavailable); return; }
             /* Other Error */
             console.warn(msg);
             this.chat.send(mError.executeCmd); return;
@@ -240,8 +238,9 @@ export class PandaPlayer implements PandaAudio {
             /* Create a resource */
             switch (this.queue[0].type) {
                 case PandaRequestTypes.SOUNDCLOUD_TRACK: this.resource = createAudioResource(await scdl.download(this.queue[0].url)); break;
-                case PandaRequestTypes.YOUTUBE_VIDEO: this.resource = createAudioResource(ytdl(this.queue[0].url)); break;
+                case PandaRequestTypes.YOUTUBE_VIDEO: this.resource = createAudioResource(await ytdl(this.queue[0].url)); break;
             }
+
             /* Play the resource */
             this.player.play(this.resource);
             /* Player listners */

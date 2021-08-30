@@ -1,4 +1,4 @@
-import { PlaylistMetadataResult } from 'yt-search';
+import { Playlist as Youtube_Playlist } from 'youtube-scrapper';
 import { PandaRequest } from '../interfaces';
 
 export const mError = {
@@ -59,14 +59,16 @@ export const mPanda = {
     },
     addToQueue: {
         invalidUrl: 'O link que me forneceste é inválido!',
-        notFound: 'Não encontrei nada que correspondesse ao teu pedido.',
-        success: (req: PandaRequest | PlaylistMetadataResult) => `Adicionei \`${req.title}\` à playlist.`
+        unavailable: 'O teu pedido encontra-se indisponível para mim.',
+        success: (req: PandaRequest | Youtube_Playlist) => `Adicionei \`${req.title}\` à playlist.`
     },
     start: {
+        ageRestricted: 'Este som tem uma restrição de idade!',
         empty: 'A minha playlist está vazia!',
         ended: (req: PandaRequest) => `Terminou: \`${req.title}\`.`,
         paused: 'Estou em pausa!',
-        playing: (req: PandaRequest) => `Agora: \`${req.title}\`.`
+        playing: (req: PandaRequest) => `Agora: \`${req.title}\`.`,
+        skipped: (req: PandaRequest) => `Saltei: \`${req.title}\`.`
     },
     pause: {
         already: 'Eu já estou na minha pausa, não me chateies.',
