@@ -222,7 +222,6 @@ export class PandaPlayer implements PandaAudio {
             let msg: string = (e.message == undefined) ? e : e.message;
             /* Invalid Url -> return */
             if (msg.startsWith('Invalid url') ||
-                msg.startsWith('Invalid URL') ||
                 msg.startsWith('Video id') ||
                 msg.startsWith(`Cannot read property 'videoId' of undefined`)) { this.chat.send(mPanda.addToQueue.invalidUrl); return; }
             /* Unavailable -> return */
