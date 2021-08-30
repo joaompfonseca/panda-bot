@@ -335,6 +335,7 @@ export class PandaPlayer implements PandaAudio {
             /* Bot is not in a vc -> return */
             if (this.vcId == null) { this.chat.send(mPanda.skip.botNotVC); return; }
             /* Queue is empty -> return */
+            if (this.queue.length == 0) { this.chat.send(mPanda.skip.empty); return; }
 
             /* Remove all listners */
             this.player.removeAllListeners();
