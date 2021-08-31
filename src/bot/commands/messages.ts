@@ -12,7 +12,7 @@ export const mHelp: { [category: string]: { [term: string]: string } } = {
         help: 'é trivial',
         version: 'a minha versão atual',
         ping: 'digo pong',
-        mc: 'status do servidor',
+        'mc [..]?': 'status do servidor',
         'game [..]?, [..]?,..': 'sugiro-te um jogo'
     },
     'Panda Player': {
