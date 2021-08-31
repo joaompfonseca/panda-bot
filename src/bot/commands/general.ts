@@ -46,19 +46,21 @@ export async function ping(chat: TextBasedChannels, time: number): Promise<void>
 /**
  * Sends Minecraft Server status to the given chat.
  * @param chat 
- * @returns
+ * @param args User given ip address.
+ * @returns 
  */
-export async function mc(chat: TextBasedChannels): Promise<void> {
-    let embed = new MessageEmbed();
+export async function mc(chat: TextBasedChannels, args: string): Promise<void> {
+    let ip = (args.length == 0) ? process.env.MCSERVER! : args;
+    let embed = new MessageEmbed({title: `\`${ip}\``});
 
     try {
-        let data = await msu.status(process.env.MCSERVER!);
-        let playerNames = (data.onlinePlayers! > 0) ? data.samplePlayers!.map(p => p.name).join(', ') : '_ _';
+        let data = await msu.status(ip);
+        let description = (data.description!.toRaw().length > 0) ? data.description!.toRaw() : '_ _';
+        let playerNames = (data.samplePlayers!.length > 0) ? data.samplePlayers!.map(p => p.name).join(', ') : '_ _';
 
         embed.setColor('#00FF00')
             .setAuthor('ONLINE', 'https://i.imgur.com/JytGYe6.png')
-            .setTitle(`\`${data.host}\``)
-            .addField('Descrição', data.description!.descriptionText, true)
+            .addField('Descrição', description, true)
             .addField(`Jogadores (${data.onlinePlayers}/${data.maxPlayers})`, playerNames, true);
     }
     catch (e) {

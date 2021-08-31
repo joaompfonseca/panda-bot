@@ -18,7 +18,7 @@ export function cmdHandler(cmd: string, args: string, guild: PandaGuild, chat: T
         case 'help':        help(chat); break;
         case 'version':     version(chat); break;
         case 'ping':        ping(chat, time); break;
-        case 'mc':          mc(chat); break;
+        case 'mc':          mc(chat, args); break;
         case 'game':        game(chat, args); break;
         /* Panda Player */
         case 'join':        guild.pandaPlayer.join(chat, vcId); break;
