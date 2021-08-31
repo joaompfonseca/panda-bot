@@ -8,11 +8,11 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Description in `README.md`.
 
-### Fixed
-- Minor TypeScript errors.
-
 ### Removed
 - Unused dependency from `package.json`.
+
+### Fixed
+- Minor TypeScript errors.
 
 ## [0.1.0] - 2021-08-31
 ### Added
