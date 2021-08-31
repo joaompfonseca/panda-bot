@@ -1,6 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2021-08-31
+### Added
+- New `version` command.
+
+### Changed
+- Description in `README.md` and `package.json`.
+- Now `game` command accepts user given ip address, defaults to the one in `.env` if none is provided.
+- Now `play` command supports Spotify tracks, albums and playlists.
+
 ## [0.1.1] - 2021-08-31
 ### Added
 - Description to `package.json`.
@@ -37,7 +46,7 @@ All notable changes to this project will be documented in this file.
 
 ## [0.0.0-12.5.3] - 2021-08-24
 
-
+[0.2.0]: https://github.com/joaompfonseca/panda-bot/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/joaompfonseca/panda-bot/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/joaompfonseca/panda-bot/compare/v0.0.0...v0.1.0
 [0.0.0]: https://github.com/joaompfonseca/panda-bot/compare/v0.0.0-13.1.0...v0.0.0

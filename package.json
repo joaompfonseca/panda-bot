@@ -1,7 +1,7 @@
 {
   "name": "panda-bot",
-  "version": "0.1.1",
-  "description": "Bot that can play Youtube audio and SoundCloud tracks over Discord voice channels.",
+  "version": "0.2.0",
+  "description": "Bot that can play audio from SoundCloud, Spotify and Youtube over Discord voice channels.",
   "main": "./build/start.js",
   "type": "module",
   "scripts": {
@@ -22,6 +22,7 @@
     "minecraft-server-util": "^3.5.2",
     "node": "^16.6.1",
     "scdl-core": "^1.0.12",
+    "spotify-url-info": "^2.2.3",
     "tweetnacl": "^1.0.3",
     "youtube-scrapper": "^1.0.4",
     "ytdl-core-discord": "^1.3.1"
