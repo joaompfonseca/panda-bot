@@ -46,7 +46,7 @@ export class PandaPlayer implements PandaAudio {
             /* Create a connection */
             this.connectTo(vcId); return;
         }
-        catch (e) {
+        catch (e: any) {
             console.warn(e.message);
             this.chat.send(mError.executeCmd); return;
         }
@@ -85,7 +85,7 @@ export class PandaPlayer implements PandaAudio {
             });
             return;
         }
-        catch (e) {
+        catch (e: any) {
             console.warn(e.message);
             this.chat.send(mError.executeCmd); return;
         }
@@ -105,7 +105,7 @@ export class PandaPlayer implements PandaAudio {
             /* Leave vc */
             this.connection!.disconnect(); return;
         }
-        catch (e) {
+        catch (e: any) {
             console.warn(e.message);
             this.chat.send(mError.executeCmd); return;
         }
@@ -138,7 +138,7 @@ export class PandaPlayer implements PandaAudio {
             if (this.player.state.status == AudioPlayerStatus.Idle) { this.start() }
             return;
         }
-        catch (e) {
+        catch (e: any) {
             console.warn(e.message);
             this.chat.send(mError.executeCmd); return;
         }
@@ -218,7 +218,7 @@ export class PandaPlayer implements PandaAudio {
             }
             return;
         }
-        catch (e) {
+        catch (e: any) {
             let msg: string = (e.message == undefined) ? e : e.message;
             /* Invalid Url -> return */
             if (msg.startsWith('Invalid url') ||
@@ -267,7 +267,7 @@ export class PandaPlayer implements PandaAudio {
                 });
             return;
         }
-        catch (e) {
+        catch (e: any) {
             let msg: string = (e.message == undefined) ? e : e.message;
             /* Age Restricted -> return */
             if (msg.startsWith('Status code: 410')) {
@@ -301,7 +301,7 @@ export class PandaPlayer implements PandaAudio {
             /* Pause the player */
             this.player.pause();
         }
-        catch (e) {
+        catch (e: any) {
             console.warn(e.message);
             this.chat.send(mError.executeCmd); return;
         }
@@ -328,7 +328,7 @@ export class PandaPlayer implements PandaAudio {
             /* Unpaused the player */
             this.player.unpause();
         }
-        catch (e) {
+        catch (e: any) {
             console.warn(e.message);
             this.chat.send(mError.executeCmd); return;
         }
@@ -358,7 +358,7 @@ export class PandaPlayer implements PandaAudio {
             /* Play next request */
             this.start(); return;
         }
-        catch (e) {
+        catch (e: any) {
             console.warn(e.message);
             this.chat.send(mError.executeCmd); return;
         }
@@ -387,7 +387,7 @@ export class PandaPlayer implements PandaAudio {
             this.queue = (this.player.state.status == AudioPlayerStatus.Playing) ? [this.queue[0]] : [];
             this.chat.send(mPanda.clear.success(numClear)); return;
         }
-        catch (e) {
+        catch (e: any) {
             console.warn(e.message);
             this.chat.send(mError.executeCmd); return;
         }
@@ -411,7 +411,7 @@ export class PandaPlayer implements PandaAudio {
             if (this.queue.length > 5) { str += `\n+ \`${this.queue.length - num}\``; }
             this.chat.send(str); return;
         }
-        catch (e) {
+        catch (e: any) {
             console.warn(e.message);
             this.chat.send(mError.executeCmd); return;
         }
