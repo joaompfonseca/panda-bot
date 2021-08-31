@@ -21,6 +21,11 @@ export function help(chat: TextBasedChannels): void {
     chat.send({ embeds: [embed] }); return;
 }
 
+/**
+ * Sends Bot's current version to given chat.
+ * @param chat 
+ * @returns 
+ */
 export function version(chat: TextBasedChannels): void { chat.send(mVersion(process.env.npm_package_version!)); return; }
 
 /**
