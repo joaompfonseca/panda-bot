@@ -1,7 +1,7 @@
 {
   "name": "panda-bot",
   "version": "0.1.0",
-  "description": "",
+  "description": "Bot that can play Youtube audio and SoundCloud tracks over Discord voice channels.",
   "main": "./build/start.js",
   "type": "module",
   "scripts": {
