@@ -62,8 +62,10 @@ export const mPanda = {
     },
     addToQueue: {
         invalidUrl: 'O link que me forneceste é inválido!',
+        progress: (num: number) => `Estou a adicionar estes sons à playlist... \`${num}\` ${(num == 1) ? 'restante' : 'restantes'}.`,
         unavailable: 'O teu pedido encontra-se indisponível para mim.',
-        success: (req: PandaRequest | Youtube_Playlist) => `Adicionei \`${req.title}\` à playlist.`
+        success: (req: PandaRequest | Youtube_Playlist) => `Adicionei \`${req.title}\` à playlist.`,
+        successNum: (num: number) => `Adicionei \`${num}\` ${(num == 1) ? 'som' : 'sons'} à playlist.`
     },
     start: {
         ageRestricted: 'Este som tem uma restrição de idade!',

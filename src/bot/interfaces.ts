@@ -4,8 +4,9 @@ import { PandaPlayer } from './commands/PandaPlayer.js';
 
 /* PandaRequestTypes */
 export enum PandaRequestTypes {
-    YOUTUBE_VIDEO = 'youtube video',
-    SOUNDCLOUD_TRACK = 'soundcloud track'
+    SOUNDCLOUD_TRACK = 'soundcloud track',
+    SPOTIFY_TRACK = 'spotify track',
+    YOUTUBE_VIDEO = 'youtube video'
 }
 
 /* PandaRequest */

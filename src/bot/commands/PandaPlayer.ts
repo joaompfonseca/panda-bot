@@ -1,7 +1,8 @@
 import { TextBasedChannels } from 'discord.js';
 import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from '@discordjs/voice';
 import { SoundCloud, Track as Soundcloud_Track } from 'scdl-core'; const scdl = new SoundCloud(); scdl.connect();
-import scrapper, { YoutubeVideo as Youtube_Video, Playlist as Youtube_Playlist, YoutubeSearchResults as Youtube_Query } from 'youtube-scrapper';
+import spinfo, { Preview as Spotify_Track, Tracks as Spotify_Playlist_Track } from 'spotify-url-info';
+import ytinfo, { YoutubeVideo as Youtube_Video, Playlist as Youtube_Playlist, YoutubeSearchResults as Youtube_Query } from 'youtube-scrapper';
 import ytdl from 'ytdl-core-discord';
 import { PandaAudio, PandaRequest, PandaRequestTypes } from '../interfaces.js';
 import { mError, mPanda } from './messages.js';
@@ -151,7 +152,7 @@ export class PandaPlayer implements PandaAudio {
      */
     async addToQueue(req: string): Promise<void> {
         try {
-            let data: Soundcloud_Track | Youtube_Video | Youtube_Playlist | Youtube_Query; let pandaRequest: PandaRequest;
+            let data: Soundcloud_Track | Spotify_Track | Spotify_Playlist_Track[] | Youtube_Video | Youtube_Playlist | Youtube_Query; let pandaRequest: PandaRequest;
             /* Request is a Soundcloud track (link) */
             if (req.includes('soundcloud.com/')) {
                 /* Get data */
@@ -166,6 +167,48 @@ export class PandaPlayer implements PandaAudio {
                 this.queue.push(pandaRequest);
                 this.chat.send(mPanda.addToQueue.success(pandaRequest));
             }
+            /* Request is a Spotify track (link) */
+            else if (req.includes('spotify.com/track/')) {
+                /* Get data - Spotify */
+                data = await spinfo.getPreview(req);
+                /* Get title */
+                let title = `${data.artist} - ${data.title}`;
+                /* Get data - Youtube */
+                data = await ytinfo.search(title);
+                /* Format data */
+                pandaRequest = {
+                    title: title,
+                    type: PandaRequestTypes.SPOTIFY_TRACK,
+                    url: `https://youtube.com/watch?v=${data.videos[0].id}`
+                };
+                /* Add request to queue */
+                this.queue.push(pandaRequest);
+                this.chat.send(mPanda.addToQueue.success(pandaRequest));
+            }
+            /* Request is a Spotify playlist (link) */
+            else if (req.includes('spotify.com/album/') || req.includes('spotify.com/playlist/')) {
+                /* Get data - Spotify */
+                data = await spinfo.getTracks(req);
+                /* Get titles */
+                let titles = data.map(t => `${t.artists![0].name} - ${t.name}`);
+                /* Send progress message */
+                let msg = await this.chat.send(mPanda.addToQueue.progress(titles.length));
+                for (let i = 0; i < titles.length; i++) {
+                    /* Get data - Youtube */
+                    data = await ytinfo.search(titles[i]);
+                    /* Format data */
+                    pandaRequest = {
+                        title: titles[i],
+                        type: PandaRequestTypes.SPOTIFY_TRACK,
+                        url: `https://youtube.com/watch?v=${data.videos[0].id}`
+                    };
+                    /* Add request to queue */
+                    this.queue.push(pandaRequest);
+                    /* Edit message every 5 requests */
+                    if (i % 5 == 0) msg.edit(mPanda.addToQueue.progress(titles.length - i - 1));
+                }
+                msg.edit(mPanda.addToQueue.successNum(titles.length));
+            }
             /* Request is a Youtube video (link) */
             else if (req.includes('youtube.com/watch?v=') || req.includes('youtu.be/')) {
                 /* Get videoId */
@@ -173,7 +216,7 @@ export class PandaPlayer implements PandaAudio {
                 if (req.includes('youtube.com/watch?v=')) { videoId = req.substring(req.search('=') + 1, (req.search('&') == -1) ? req.length : req.search('&')); }
                 if (req.includes('youtu.be/')) { videoId = req.substring(req.search('e/') + 2); }
                 /* Get data */
-                data = await scrapper.getVideoInfo(videoId!);
+                data = await ytinfo.getVideoInfo(videoId!);
                 /* Format data */
                 pandaRequest = {
                     title: data.details.title,
@@ -189,7 +232,7 @@ export class PandaPlayer implements PandaAudio {
                 /* Get listId */
                 let listId = req.substring(req.search('=') + 1);
                 /* Get data */
-                data = await scrapper.getPlaylistInfo(listId);
+                data = await ytinfo.getPlaylistInfo(listId);
                 /* Format data */
                 for (let i = 0; i < data.tracks.length; i++) {
                     pandaRequest = {
@@ -205,7 +248,7 @@ export class PandaPlayer implements PandaAudio {
             /* Request is a Youtube video (query) */
             else {
                 /* Get data */
-                data = await scrapper.search(req);
+                data = await ytinfo.search(req);
                 /* Format data */
                 pandaRequest = {
                     title: data.videos[0].title,
@@ -245,6 +288,7 @@ export class PandaPlayer implements PandaAudio {
             /* Create a resource */
             switch (this.queue[0].type) {
                 case PandaRequestTypes.SOUNDCLOUD_TRACK: this.resource = createAudioResource(await scdl.download(this.queue[0].url)); break;
+                case PandaRequestTypes.SPOTIFY_TRACK:
                 case PandaRequestTypes.YOUTUBE_VIDEO: this.resource = createAudioResource(await ytdl(this.queue[0].url)); break;
             }
 
