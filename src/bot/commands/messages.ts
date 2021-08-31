@@ -10,6 +10,7 @@ export const mError = {
 export const mHelp: { [category: string]: { [term: string]: string } } = {
     Gerais: {
         help: 'é trivial',
+        version: 'a minha versão atual',
         ping: 'digo pong',
         mc: 'status do servidor',
         'game [..]?, [..]?,..': 'sugiro-te um jogo'
@@ -25,6 +26,8 @@ export const mHelp: { [category: string]: { [term: string]: string } } = {
         queue: 'mostro o que está na playlist'
     }
 };
+
+export const mVersion = (ver: string) => `Versão atual: ${ver}`
 
 export const mPing = {
     pinging: 'Pinging...',

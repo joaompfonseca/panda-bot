@@ -1,7 +1,7 @@
 import { TextBasedChannels, MessageEmbed } from 'discord.js';
 import msu from 'minecraft-server-util';
 import dotenv from 'dotenv'; dotenv.config();
-import { mError, mHelp, mPing, mGame } from './messages.js';
+import { mError, mHelp, mPing, mGame, mVersion } from './messages.js';
 
 /**
  * Sends Bot's command info to the given chat.
@@ -20,6 +20,8 @@ export function help(chat: TextBasedChannels): void {
 
     chat.send({ embeds: [embed] }); return;
 }
+
+export function version(chat: TextBasedChannels): void { chat.send(mVersion(process.env.npm_package_version!)); return; }
 
 /**
  * Sends Bot's ping to the given chat.
