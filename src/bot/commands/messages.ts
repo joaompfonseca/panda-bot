@@ -1,5 +1,6 @@
 import { Playlist as Youtube_Playlist } from 'youtube-scrapper';
-import { PandaRequest } from '../interfaces';
+import { prefix } from '../bot-config.js';
+import { PandaRequest } from '../interfaces.js';
 
 export const mError = {
     invalidArgs: 'Argumentos inválidos!',
@@ -10,7 +11,7 @@ export const mError = {
 export const mHelp: { [category: string]: { [term: string]: string } } = {
     Gerais: {
         help: 'é trivial',
-        version: 'a minha versão atual',
+        info: 'informação sobre mim',
         ping: 'digo pong',
         'mc [..]?': 'status do servidor',
         'game [..]?, [..]?,..': 'sugiro-te um jogo'
@@ -27,7 +28,15 @@ export const mHelp: { [category: string]: { [term: string]: string } } = {
     }
 };
 
-export const mVersion = (ver: string) => `Versão atual: ${ver}`
+export const mInfo = {
+    title: 'Sobre mim',
+    description: (ver: string) => `
+        Para veres os comandos no cardápio, digita \`${prefix}help\`
+        [Adiciona-me](https://discord.com/api/oauth2/authorize?client_id=867881907119456286&permissions=8&scope=bot%20applications.commands)
+        [Changelog](https://github.com/joaompfonseca/panda-bot/blob/master/CHANGELOG.md)
+        [Repositório](https://github.com/joaompfonseca/panda-bot)
+        Versão atual - ${ver}`
+};
 
 export const mPing = {
     pinging: 'Pinging...',

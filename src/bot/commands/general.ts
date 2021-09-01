@@ -1,7 +1,7 @@
 import { TextBasedChannels, MessageEmbed } from 'discord.js';
 import msu from 'minecraft-server-util';
 import dotenv from 'dotenv'; dotenv.config();
-import { mError, mHelp, mPing, mGame, mVersion } from './messages.js';
+import { mError, mHelp, mPing, mGame, mInfo } from './messages.js';
 
 /**
  * Sends Bot's command info to the given chat.
@@ -22,11 +22,18 @@ export function help(chat: TextBasedChannels): void {
 }
 
 /**
- * Sends Bot's current version to given chat.
+ * Sends Bot's info to given chat.
  * @param chat 
  * @returns 
  */
-export function version(chat: TextBasedChannels): void { chat.send(mVersion(process.env.npm_package_version!)); return; }
+export function info(chat: TextBasedChannels): void {
+    let embed = new MessageEmbed({
+        title: mInfo.title,
+        description: mInfo.description(process.env.npm_package_version!)
+    });
+
+    chat.send({ embeds: [embed] }); return;
+}
 
 /**
  * Sends Bot's ping to the given chat.
@@ -51,7 +58,7 @@ export async function ping(chat: TextBasedChannels, time: number): Promise<void>
  */
 export async function mc(chat: TextBasedChannels, args: string): Promise<void> {
     let ip = (args.length == 0) ? process.env.MCSERVER! : args;
-    let embed = new MessageEmbed({title: `\`${ip}\``});
+    let embed = new MessageEmbed({ title: `\`${ip}\`` });
 
     try {
         let data = await msu.status(ip);
