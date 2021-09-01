@@ -6,7 +6,7 @@ Bot that can play audio from SoundCloud, Spotify and Youtube over Discord voice 
 - Messages are in `Portuguese`, but can be changed [here](https://github.com/joaompfonseca/panda-bot/blob/master/src/bot/commands/messages.ts).
 
 ## Commands
-- General: `help`, `ping`, `mc`, `game`
+- General: `help`, `info`, `ping`, `mc`, `game`
 - PandaPlayer: `join`, `leave/disconnect`, `play`, `pause`, `unpause/resume`, `skip`, `clear`, `queue`
 
 ## Installation
