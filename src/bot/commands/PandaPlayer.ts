@@ -205,7 +205,7 @@ export class PandaPlayer implements PandaAudio {
                     /* Add request to queue */
                     this.queue.push(pandaRequest);
                     /* Edit message every 5 requests */
-                    if (i % 5 == 0) msg.edit(mPanda.addToQueue.progress(titles.length - i - 1));
+                    if ((i + 1) % 5 == 0) msg.edit(mPanda.addToQueue.progress(titles.length - i - 1));
                 }
                 msg.edit(mPanda.addToQueue.successNum(titles.length));
             }
