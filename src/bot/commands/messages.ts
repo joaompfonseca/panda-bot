@@ -30,9 +30,9 @@ export const mHelp: { [category: string]: { [term: string]: string } } = {
 
 export const mInfo = {
     title: 'Sobre mim',
-    description: (ver: string) => `
+    description: (clientId: string, ver: string) => `
         Para veres os comandos no cardápio, digita \`${prefix}help\`
-        [Adiciona-me](https://discord.com/api/oauth2/authorize?client_id=867881907119456286&permissions=8&scope=bot%20applications.commands)
+        [Adiciona-me](https://discord.com/api/oauth2/authorize?client_id=${clientId}&permissions=8&scope=bot%20applications.commands)
         [Changelog](https://github.com/joaompfonseca/panda-bot/blob/master/CHANGELOG.md)
         [Repositório](https://github.com/joaompfonseca/panda-bot)
         Versão atual - ${ver}`

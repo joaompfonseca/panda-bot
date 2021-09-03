@@ -1,14 +1,15 @@
-import { Message } from 'discord.js';
+import { Client, Message } from 'discord.js';
 import { prefix } from '../bot-config.js';
 import { guildHandler } from '../handlers/guilds.js';
 import { cmdHandler } from '../handlers/commands.js';
 
 /**
  * Runs when client's "messageCreate" event is triggered.
+ * @param client 
  * @param msg 
- * @returns
+ * @returns 
  */
-export function messageCreate(msg: Message): void {
+export function messageCreate(client: Client, msg: Message): void {
 
     if (msg.author.bot) return;
     if (!msg.content.startsWith(prefix)) return;
@@ -23,5 +24,5 @@ export function messageCreate(msg: Message): void {
     const time = msg.createdTimestamp;
     const vcId = msg.member!.voice.channelId;
 
-    cmdHandler(cmd, args, guild, chat, time, vcId); return;
+    cmdHandler(client, cmd, args, guild, chat, time, vcId); return;
 }

@@ -1,4 +1,4 @@
-import { TextBasedChannels, MessageEmbed } from 'discord.js';
+import { TextBasedChannels, MessageEmbed, Client } from 'discord.js';
 import msu from 'minecraft-server-util';
 import dotenv from 'dotenv'; dotenv.config();
 import { mError, mHelp, mPing, mGame, mInfo } from './messages.js';
@@ -23,13 +23,14 @@ export function help(chat: TextBasedChannels): void {
 
 /**
  * Sends Bot's info to given chat.
+ * @param client 
  * @param chat 
  * @returns 
  */
-export function info(chat: TextBasedChannels): void {
+export function info(client: Client, chat: TextBasedChannels): void {
     let embed = new MessageEmbed({
         title: mInfo.title,
-        description: mInfo.description(process.env.npm_package_version!)
+        description: mInfo.description(client.application!.id, process.env.npm_package_version!)
     });
 
     chat.send({ embeds: [embed] }); return;

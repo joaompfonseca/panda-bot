@@ -13,6 +13,6 @@ export function client(): void {
     });
 
     client.on('ready', () => ready(client));
-    client.on('messageCreate', msg => messageCreate(msg));
+    client.on('messageCreate', msg => messageCreate(client, msg));
     client.login(process.env.TOKEN); return;
 }
