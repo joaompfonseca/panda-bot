@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [0.2.2] - 2021-09-02
+## [0.2.2] - 2021-09-03
 ### Fixed
 - Spotify album and playlist adding counter.
 - Link to add Bot in `info` command refers to current instance.
