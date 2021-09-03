@@ -194,6 +194,8 @@ export class PandaPlayer implements PandaAudio {
                 /* Send progress message */
                 let msg = await this.chat.send(mPanda.addToQueue.progress(titles.length));
                 for (let i = 0; i < titles.length; i++) {
+                    /* Edit message every 5 requests */
+                    if (i != 0 && i % 5 == 0) msg.edit(mPanda.addToQueue.progress(titles.length - i));
                     /* Get data - Youtube */
                     data = await ytinfo.search(titles[i]);
                     /* Format data */
@@ -204,8 +206,6 @@ export class PandaPlayer implements PandaAudio {
                     };
                     /* Add request to queue */
                     this.queue.push(pandaRequest);
-                    /* Edit message every 5 requests */
-                    if ((i + 1) % 5 == 0) msg.edit(mPanda.addToQueue.progress(titles.length - i - 1));
                 }
                 msg.edit(mPanda.addToQueue.successNum(titles.length));
             }
