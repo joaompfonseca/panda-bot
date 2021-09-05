@@ -3,7 +3,6 @@
 ## Description
 Bot that can play audio from SoundCloud, Spotify and Youtube over Discord voice channels.
 - Written in TypeScript (node v16.6.1).
-- Messages are in `Portuguese`, but can be changed [here](https://github.com/joaompfonseca/panda-bot/blob/master/src/bot/commands/messages.ts).
 
 ## Commands
 - General: `help`, `info`, `ping`, `mc`, `game`
@@ -14,7 +13,9 @@ Bot that can play audio from SoundCloud, Spotify and Youtube over Discord voice 
 
 ## Configuration
 - Create an `.env` file in root with the keys `TOKEN=[Discord Bot Token]` and `MCSERVER=[Minecraft Server IP]`.
-- Change bot configurations [here](https://github.com/joaompfonseca/panda-bot/blob/master/src/bot/bot-config.ts).
+- Change bot configurations [here](https://github.com/joaompfonseca/panda-bot/blob/master/src/bot/config.ts).
+- Change bot slash commands [here](https://github.com/joaompfonseca/panda-bot/blob/master/src/bot/slash/config.ts).
+- Messages are in `Portuguese`, but can be changed [here](https://github.com/joaompfonseca/panda-bot/blob/master/src/bot/commands/messages.ts).
 
 ## Starting the Bot
 - Run `npm start` in root.
