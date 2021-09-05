@@ -1,15 +1,15 @@
-import { TextBasedChannels } from 'discord.js';
 import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from '@discordjs/voice';
 import { SoundCloud, Track as Soundcloud_Track } from 'scdl-core'; const scdl = new SoundCloud(); scdl.connect();
 import spinfo, { Preview as Spotify_Track, Tracks as Spotify_Playlist_Track } from 'spotify-url-info';
 import ytinfo, { YoutubeVideo as Youtube_Video, Playlist as Youtube_Playlist, YoutubeSearchResults as Youtube_Query } from 'youtube-scrapper';
 import ytdl from 'ytdl-core-discord';
+import { PandaChat } from './PandaChat.js';
 import { PandaAudio, PandaRequest, PandaRequestTypes } from '../interfaces.js';
 import { mError, mPanda } from './messages.js';
 
 export class PandaPlayer implements PandaAudio {
     adapterCreator: DiscordGatewayAdapterCreator;
-    chat: TextBasedChannels;
+    chat: PandaChat;
     connection: VoiceConnection | null;
     guildId: string;
     player: AudioPlayer;
@@ -17,7 +17,13 @@ export class PandaPlayer implements PandaAudio {
     resource: AudioResource | null;
     vcId: string | null;
 
-    constructor(adapterCreator: DiscordGatewayAdapterCreator, chat: TextBasedChannels, guildId: string) {
+    /**
+     * Custom implementation of discord.js voice commands.
+     * @param adapterCreator 
+     * @param chat 
+     * @param guildId 
+     */
+    constructor(adapterCreator: DiscordGatewayAdapterCreator, chat: PandaChat, guildId: string) {
         this.adapterCreator = adapterCreator;
         this.chat = chat;
         this.connection = null;
@@ -34,7 +40,7 @@ export class PandaPlayer implements PandaAudio {
      * @param vcId 
      * @returns 
      */
-    join(chat: TextBasedChannels, vcId: string | null): void {
+    join(chat: PandaChat, vcId: string | null): void {
         try {
             this.chat = chat;
             /* User is not in a vc -> return */
@@ -97,7 +103,7 @@ export class PandaPlayer implements PandaAudio {
      * @param chat 
      * @returns 
      */
-    leave(chat: TextBasedChannels): void {
+    leave(chat: PandaChat): void {
         try {
             this.chat = chat;
             /* Bot is not in a vc -> return */
@@ -119,7 +125,7 @@ export class PandaPlayer implements PandaAudio {
      * @param req 
      * @returns 
      */
-    async play(chat: TextBasedChannels, vcId: string | null, req: string): Promise<void> {
+    async play(chat: PandaChat, vcId: string | null, req: string): Promise<void> {
         try {
             this.chat = chat;
             /* Request is empty -> return */
@@ -330,7 +336,7 @@ export class PandaPlayer implements PandaAudio {
      * @param vcId 
      * @returns 
      */
-    pause(chat: TextBasedChannels, vcId: string | null): void {
+    pause(chat: PandaChat, vcId: string | null): void {
         try {
             this.chat = chat;
             /* User is not in a vc -> return */
@@ -357,7 +363,7 @@ export class PandaPlayer implements PandaAudio {
      * @param vcId 
      * @returns 
      */
-    unpause(chat: TextBasedChannels, vcId: string | null): void {
+    unpause(chat: PandaChat, vcId: string | null): void {
         try {
             this.chat = chat;
             /* User is not in a vc -> return */
@@ -384,7 +390,7 @@ export class PandaPlayer implements PandaAudio {
      * @param vcId 
      * @returns 
      */
-    skip(chat: TextBasedChannels, vcId: string | null): void {
+    skip(chat: PandaChat, vcId: string | null): void {
         try {
             this.chat = chat;
             /* User is not in a vc -> return */
@@ -414,7 +420,7 @@ export class PandaPlayer implements PandaAudio {
      * @param vcId 
      * @returns 
      */
-    clear(chat: TextBasedChannels, vcId: string | null): void {
+    clear(chat: PandaChat, vcId: string | null): void {
         try {
             this.chat = chat;
             /* User is not in a vc -> return */
@@ -442,7 +448,7 @@ export class PandaPlayer implements PandaAudio {
      * @param chat 
      * @returns 
      */
-    getQueue(chat: TextBasedChannels): void {
+    getQueue(chat: PandaChat): void {
         try {
             this.chat = chat;
             /* Queue is empty -> return */

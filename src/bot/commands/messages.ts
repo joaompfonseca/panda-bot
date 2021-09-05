@@ -1,5 +1,5 @@
 import { Playlist as Youtube_Playlist } from 'youtube-scrapper';
-import { prefix } from '../bot-config.js';
+import { prefix } from '../config.js';
 import { PandaRequest } from '../interfaces.js';
 
 export const mError = {

@@ -1,6 +1,6 @@
-import { TextBasedChannels } from 'discord.js';
 import { VoiceConnection, AudioPlayer, AudioResource } from '@discordjs/voice';
 import { PandaPlayer } from './commands/PandaPlayer.js';
+import { PandaChat } from './commands/PandaChat.js';
 
 /* PandaRequestTypes */
 export enum PandaRequestTypes {
@@ -19,7 +19,7 @@ export interface PandaRequest {
 /* PandaAudio */
 export interface PandaAudio {
     adapterCreator: Function;
-    chat: TextBasedChannels | null;
+    chat: PandaChat;
     connection: VoiceConnection | null;
     guildId: string;
     player: AudioPlayer;
@@ -27,17 +27,17 @@ export interface PandaAudio {
     resource: AudioResource | null;
     vcId: string | null;
 
-    join(chat: TextBasedChannels, vcId: string | null): void;
+    join(chat: PandaChat, vcId: string | null): void;
     connectTo(vcId: string): void;
-    leave(chat: TextBasedChannels): void;
-    play(chat: TextBasedChannels, vcId: string | null, req: string): Promise<void>;
+    leave(chat: PandaChat): void;
+    play(chat: PandaChat, vcId: string | null, req: string): Promise<void>;
     addToQueue(req: string): Promise<void>;
     start(): Promise<void>;
-    pause(chat: TextBasedChannels, vcId: string | null): void;
-    unpause(chat: TextBasedChannels, vcId: string | null): void;
-    skip(chat: TextBasedChannels, vcId: string | null): void;
-    clear(chat: TextBasedChannels, vcId: string | null): void;
-    getQueue(chat: TextBasedChannels): void;
+    pause(chat: PandaChat, vcId: string | null): void;
+    unpause(chat: PandaChat, vcId: string | null): void;
+    skip(chat: PandaChat, vcId: string | null): void;
+    clear(chat: PandaChat, vcId: string | null): void;
+    getQueue(chat: PandaChat): void;
 }
 
 /* PandaGuild */

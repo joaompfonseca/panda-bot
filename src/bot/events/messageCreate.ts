@@ -1,7 +1,8 @@
 import { Client, Message } from 'discord.js';
-import { prefix } from '../bot-config.js';
+import { prefix } from '../config.js';
 import { guildHandler } from '../handlers/guilds.js';
 import { cmdHandler } from '../handlers/commands.js';
+import { PandaChat } from '../commands/PandaChat.js';
 
 /**
  * Runs when client's "messageCreate" event is triggered.
@@ -19,10 +20,10 @@ export function messageCreate(client: Client, msg: Message): void {
 
     const cmd = (argsPos == -1) ? content.substring(prefix.length) : content.substring(prefix.length, argsPos);
     const args = (argsPos == -1) ? '' : content.substring(argsPos).trimStart();
-    const guild = guildHandler(msg.guildId!, msg.channel, msg.guild!.voiceAdapterCreator);
-    const chat = msg.channel;
+    const chat = new PandaChat(msg.channel);
+    const guild = guildHandler(msg.guildId!, chat, msg.guild!.voiceAdapterCreator);
     const time = msg.createdTimestamp;
     const vcId = msg.member!.voice.channelId;
 
-    cmdHandler(client, cmd, args, guild, chat, time, vcId); return;
+    cmdHandler(client, cmd, args, chat, guild, time, vcId); return;
 }

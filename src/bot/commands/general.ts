@@ -1,6 +1,7 @@
-import { TextBasedChannels, MessageEmbed, Client } from 'discord.js';
+import { MessageEmbed, Client } from 'discord.js';
 import msu from 'minecraft-server-util';
 import dotenv from 'dotenv'; dotenv.config();
+import { PandaChat } from './PandaChat.js';
 import { mError, mHelp, mPing, mGame, mInfo } from './messages.js';
 
 /**
@@ -8,7 +9,7 @@ import { mError, mHelp, mPing, mGame, mInfo } from './messages.js';
  * @param chat
  * @returns
  */
-export function help(chat: TextBasedChannels): void {
+export function help(chat: PandaChat): void {
     let embed = new MessageEmbed({ title: 'Comandos' });
 
     for (let category in mHelp) {
@@ -27,7 +28,7 @@ export function help(chat: TextBasedChannels): void {
  * @param chat 
  * @returns 
  */
-export function info(client: Client, chat: TextBasedChannels): void {
+export function info(client: Client, chat: PandaChat): void {
     let embed = new MessageEmbed({
         title: mInfo.title,
         description: mInfo.description(client.application!.id, process.env.npm_package_version!)
@@ -42,13 +43,11 @@ export function info(client: Client, chat: TextBasedChannels): void {
  * @param time in seconds, when message was created.
  * @returns
  */
-export async function ping(chat: TextBasedChannels, time: number): Promise<void> {
+export async function ping(chat: PandaChat, time: number): Promise<void> {
     let msg = await chat.send(mPing.pinging);
     let ping = msg.createdTimestamp - time;
 
-    msg.delete();
-
-    chat.send(mPing.done(ping)); return;
+    msg.edit(mPing.done(ping)); return;
 }
 
 /**
@@ -57,7 +56,7 @@ export async function ping(chat: TextBasedChannels, time: number): Promise<void>
  * @param args User given ip address.
  * @returns 
  */
-export async function mc(chat: TextBasedChannels, args: string): Promise<void> {
+export async function mc(chat: PandaChat, args: string): Promise<void> {
     let ip = (args.length == 0) ? process.env.MCSERVER! : args;
     let embed = new MessageEmbed({ title: `\`${ip}\`` });
 
@@ -85,7 +84,7 @@ export async function mc(chat: TextBasedChannels, args: string): Promise<void> {
  * @param args separated by commas, User given games to randomize.
  * @returns 
  */
-export function game(chat: TextBasedChannels, args: string): void {
+export function game(chat: PandaChat, args: string): void {
     let list = args.split(',').map(g => g.trim()).filter(g => g.length > 0);
 
     /* Invalid arguments */
@@ -104,4 +103,4 @@ export function game(chat: TextBasedChannels, args: string): void {
  * @param chat 
  * @returns 
  */
-export function unknown(chat: TextBasedChannels): void { chat.send(mError.unknownCmd); return; }
+export function unknown(chat: PandaChat): void { chat.send(mError.unknownCmd); return; }

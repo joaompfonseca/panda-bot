@@ -1,5 +1,6 @@
-import { Client, TextBasedChannels } from 'discord.js';
+import { Client } from 'discord.js';
 import { PandaGuild } from '../interfaces.js';
+import { PandaChat } from '../commands/PandaChat.js';
 import { game, help, info, mc, ping, unknown } from '../commands/general.js';
 
 /**
@@ -13,7 +14,7 @@ import { game, help, info, mc, ping, unknown } from '../commands/general.js';
  * @param vcId 
  * @returns 
  */
-export function cmdHandler(client: Client, cmd: string, args: string, guild: PandaGuild, chat: TextBasedChannels, time: number, vcId: string | null): void {
+export function cmdHandler(client: Client, cmd: string, args: string, chat: PandaChat, guild: PandaGuild, time: number, vcId: string | null): void {
     switch (cmd) {
         /* General */
         case 'help':        help(chat); break;
