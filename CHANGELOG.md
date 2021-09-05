@@ -1,6 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2021-09-05
+### Added
+- Support for slash commands.
+- New custom classes for better implementation of slash commands.
+- New slash command configuration file and register on startup (disabled in Bot's `config` file).
+
+### Changed
+- Now Bot configuration file is named `config` instead of `bot-config`.
+
 ## [0.2.2] - 2021-09-03
 ### Fixed
 - Spotify album and playlist adding counter.
@@ -56,7 +65,7 @@ All notable changes to this project will be documented in this file.
 
 ## [0.0.0-12.5.3] - 2021-08-24
 
-
+[0.3.0]: https://github.com/joaompfonseca/panda-bot/compare/v0.2.2...v0.3.0
 [0.2.2]: https://github.com/joaompfonseca/panda-bot/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/joaompfonseca/panda-bot/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/joaompfonseca/panda-bot/compare/v0.1.1...v0.2.0
