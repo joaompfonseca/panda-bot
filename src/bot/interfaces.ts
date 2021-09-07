@@ -27,17 +27,17 @@ export interface PandaAudio {
     resource: AudioResource | null;
     vcId: string | null;
 
-    join(chat: PandaChat, vcId: string | null): void;
-    connectTo(vcId: string): void;
-    leave(chat: PandaChat): void;
+    join(chat: PandaChat, vcId: string | null): Promise<void>;
+    connectTo(vcId: string): Promise<void>;
+    leave(chat: PandaChat): Promise<void>;
     play(chat: PandaChat, vcId: string | null, req: string): Promise<void>;
     addToQueue(req: string): Promise<void>;
     start(): Promise<void>;
-    pause(chat: PandaChat, vcId: string | null): void;
-    unpause(chat: PandaChat, vcId: string | null): void;
+    pause(chat: PandaChat, vcId: string | null): Promise<void>;
+    unpause(chat: PandaChat, vcId: string | null): Promise<void>;
     skip(chat: PandaChat, vcId: string | null): Promise<void>;
-    clear(chat: PandaChat, vcId: string | null): void;
-    getQueue(chat: PandaChat): void;
+    clear(chat: PandaChat, vcId: string | null): Promise<void>;
+    getQueue(chat: PandaChat): Promise<void>;
 }
 
 /* PandaGuild */
