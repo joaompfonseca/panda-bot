@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2021-09-07
+### Fixed
+- Panda Player messages being edited instead of creating a new one.  
+
 ## [0.3.0] - 2021-09-05
 ### Added
 - Support for slash commands.
@@ -65,6 +69,7 @@ All notable changes to this project will be documented in this file.
 
 ## [0.0.0-12.5.3] - 2021-08-24
 
+[0.3.1]: https://github.com/joaompfonseca/panda-bot/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/joaompfonseca/panda-bot/compare/v0.2.2...v0.3.0
 [0.2.2]: https://github.com/joaompfonseca/panda-bot/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/joaompfonseca/panda-bot/compare/v0.2.0...v0.2.1
