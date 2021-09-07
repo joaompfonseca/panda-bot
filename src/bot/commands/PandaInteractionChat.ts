@@ -5,6 +5,7 @@ import { PandaMessage } from "./PandaMessage.js";
 
 export class PandaInteractionChat extends PandaChat {
     int: CommandInteraction;
+    replied: boolean;
 
     /**
      * Custom implementation of discord.js TextBasedChannels with Interactions.
@@ -14,15 +15,17 @@ export class PandaInteractionChat extends PandaChat {
     constructor(chat: TextBasedChannels, int: CommandInteraction) {
         super(chat);
         this.int = int;
+        this.replied = false;
     }
 
     async send(out: string | Object): Promise<PandaMessage> {
         /* Replied to the interaction -> send a message */
-        if (this.int.replied) { 
+        if (this.replied) { 
             let msg = await this.chat.send(out);
             return new PandaMessage(msg.createdTimestamp, msg); 
         }
         /* Reply to interaction */
+        this.replied = true;
         let startTime = Date.now();
         await this.int.editReply(out);
         let endTime = Date.now();
