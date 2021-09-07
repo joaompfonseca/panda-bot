@@ -35,7 +35,7 @@ export interface PandaAudio {
     start(): Promise<void>;
     pause(chat: PandaChat, vcId: string | null): void;
     unpause(chat: PandaChat, vcId: string | null): void;
-    skip(chat: PandaChat, vcId: string | null): void;
+    skip(chat: PandaChat, vcId: string | null): Promise<void>;
     clear(chat: PandaChat, vcId: string | null): void;
     getQueue(chat: PandaChat): void;
 }

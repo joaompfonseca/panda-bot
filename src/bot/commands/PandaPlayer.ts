@@ -390,7 +390,7 @@ export class PandaPlayer implements PandaAudio {
      * @param vcId 
      * @returns 
      */
-    skip(chat: PandaChat, vcId: string | null): void {
+    async skip(chat: PandaChat, vcId: string | null): Promise<void> {
         try {
             this.chat = chat;
             /* User is not in a vc -> return */
@@ -404,7 +404,7 @@ export class PandaPlayer implements PandaAudio {
             this.player.removeAllListeners();
             /* Skip current request */
             this.player.stop();
-            this.chat.send(mPanda.skip.success(this.queue.shift()!));
+            await this.chat.send(mPanda.skip.success(this.queue.shift()!));
             /* Play next request */
             this.start(); return;
         }
