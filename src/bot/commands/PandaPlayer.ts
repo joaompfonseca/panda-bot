@@ -296,9 +296,9 @@ export class PandaPlayer implements PandaAudio {
 
             /* Create a resource */
             switch (this.queue[0].type) {
-                case PandaRequestTypes.SOUNDCLOUD_TRACK: this.resource = createAudioResource(await scdl.download(this.queue[0].url)); break;
+                case PandaRequestTypes.SOUNDCLOUD_TRACK: this.resource = createAudioResource(await scdl.download(this.queue[0].url, { highWaterMark: 1 << 25 })); break;
                 case PandaRequestTypes.SPOTIFY_TRACK:
-                case PandaRequestTypes.YOUTUBE_VIDEO: this.resource = createAudioResource(await ytdl(this.queue[0].url)); break;
+                case PandaRequestTypes.YOUTUBE_VIDEO: this.resource = createAudioResource(await ytdl(this.queue[0].url, { filter: 'audioonly', highWaterMark: 1 << 25, quality: 'highestaudio' })); break;
             }
 
             /* Play the resource */
