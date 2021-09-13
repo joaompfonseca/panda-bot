@@ -63,7 +63,7 @@ export async function mc(chat: PandaChat, args: string): Promise<void> {
     try {
         let data = await msu.status(ip);
         let description = (data.description!.toRaw().length > 0) ? data.description!.toRaw() : '_ _';
-        let playerNames = (data.samplePlayers!.length > 0) ? data.samplePlayers!.map(p => p.name).join(', ') : '_ _';
+        let playerNames = (data.samplePlayers != null) ? data.samplePlayers.map(p => p.name).join(', ') : '_ _';
 
         embed.setColor('#00FF00')
             .setAuthor('ONLINE', 'https://i.imgur.com/JytGYe6.png')
