@@ -20,5 +20,5 @@ export async function interactionCreate(client: Client, int: Interaction): Promi
     const time = int.createdTimestamp;
     const vcId = (int.guild!.voiceStates.cache.get(int.member!.user.id) == undefined) ? null : int.guild!.voiceStates.cache.get(int.member!.user.id)!.channelId;
 
-    cmdHandler(client, cmd, args, chat, guild, time, vcId); return;
+    await cmdHandler(client, cmd, args, chat, guild, time, vcId); return;
 }

@@ -10,7 +10,7 @@ import { PandaChat } from '../commands/PandaChat.js';
  * @param msg 
  * @returns 
  */
-export function messageCreate(client: Client, msg: Message): void {
+export async function messageCreate(client: Client, msg: Message): Promise<void> {
 
     if (msg.author.bot) return;
     if (!msg.content.startsWith(prefix)) return;
@@ -25,5 +25,5 @@ export function messageCreate(client: Client, msg: Message): void {
     const time = msg.createdTimestamp;
     const vcId = msg.member!.voice.channelId;
 
-    cmdHandler(client, cmd, args, chat, guild, time, vcId); return;
+    await cmdHandler(client, cmd, args, chat, guild, time, vcId); return;
 }

@@ -9,7 +9,7 @@ import { mError, mHelp, mPing, mGame, mInfo } from './messages.js';
  * @param chat
  * @returns
  */
-export function help(chat: PandaChat): void {
+export async function help(chat: PandaChat): Promise<void> {
     let embed = new MessageEmbed({ title: 'Comandos' });
 
     for (let category in mHelp) {
@@ -19,7 +19,7 @@ export function help(chat: PandaChat): void {
         embed.addField(category, text);
     }
 
-    chat.send({ embeds: [embed] }); return;
+    await chat.send({ embeds: [embed] }); return;
 }
 
 /**
@@ -28,13 +28,13 @@ export function help(chat: PandaChat): void {
  * @param chat 
  * @returns 
  */
-export function info(client: Client, chat: PandaChat): void {
+export async function info(client: Client, chat: PandaChat): Promise<void> {
     let embed = new MessageEmbed({
         title: mInfo.title,
         description: mInfo.description(client.application!.id, process.env.npm_package_version!)
     });
 
-    chat.send({ embeds: [embed] }); return;
+    await chat.send({ embeds: [embed] }); return;
 }
 
 /**
@@ -47,7 +47,7 @@ export async function ping(chat: PandaChat, time: number): Promise<void> {
     let msg = await chat.send(mPing.pinging);
     let ping = msg.createdTimestamp - time;
 
-    msg.edit(mPing.done(ping)); return;
+    await msg.edit(mPing.done(ping)); return;
 }
 
 /**
@@ -75,7 +75,7 @@ export async function mc(chat: PandaChat, args: string): Promise<void> {
             .setAuthor('OFFLINE', 'https://i.imgur.com/JytGYe6.png');
     }
 
-    chat.send({ embeds: [embed] }); return;
+    await chat.send({ embeds: [embed] }); return;
 }
 
 /**
@@ -84,18 +84,18 @@ export async function mc(chat: PandaChat, args: string): Promise<void> {
  * @param args separated by commas, User given games to randomize.
  * @returns 
  */
-export function game(chat: PandaChat, args: string): void {
+export async function game(chat: PandaChat, args: string): Promise<void> {
     let list = args.split(',').map(g => g.trim()).filter(g => g.length > 0);
 
     /* Invalid arguments */
-    if (args.length != 0 && list.length == 0) { chat.send(mError.invalidArgs); return; }
+    if (args.length != 0 && list.length == 0) { await chat.send(mError.invalidArgs); return; }
     /* No arguments */
     if (args.length == 0) list = mGame;
 
     /* Generate a random index */
     let index = Math.floor(Math.random() * list.length);
 
-    chat.send(list[index]); return;
+    await chat.send(list[index]); return;
 }
 
 /**
@@ -103,4 +103,4 @@ export function game(chat: PandaChat, args: string): void {
  * @param chat 
  * @returns 
  */
-export function unknown(chat: PandaChat): void { chat.send(mError.unknownCmd); return; }
+export async function unknown(chat: PandaChat): Promise<void> { await chat.send(mError.unknownCmd); return; }

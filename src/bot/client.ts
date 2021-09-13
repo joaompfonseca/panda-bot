@@ -8,13 +8,13 @@ import { interactionCreate } from './events/interactionCreate.js';
  * Initializes the client.
  * @returns
  */
-export function client(): void {
+export async function client(): Promise<void> {
     const client = new Client({
         intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES]
     });
 
     client.on('ready', () => ready(client));
-    client.on('messageCreate', msg => messageCreate(client, msg));
-    client.on('interactionCreate', int => interactionCreate(client, int));
-    client.login(process.env.TOKEN); return;
+    client.on('messageCreate', async msg => await messageCreate(client, msg));
+    client.on('interactionCreate', async int => await interactionCreate(client, int));
+    await client.login(process.env.TOKEN); return;
 }
