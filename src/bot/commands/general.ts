@@ -1,6 +1,7 @@
 import { MessageEmbed, Client } from 'discord.js';
 import msu from 'minecraft-server-util';
 import dotenv from 'dotenv'; dotenv.config();
+import { mcServer } from '../config.js';
 import { PandaChat } from './PandaChat.js';
 import { mError, mHelp, mPing, mGame, mInfo } from './messages.js';
 
@@ -57,14 +58,14 @@ export async function ping(chat: PandaChat, time: number): Promise<void> {
  * @returns 
  */
 export async function mc(chat: PandaChat, args: string): Promise<void> {
-    let ip = (args.length == 0) ? process.env.MCSERVER! : args;
+    let ip = (args.length == 0) ? mcServer : args;
     let embed = new MessageEmbed({ title: `\`${ip}\`` });
 
     try {
         let data = await msu.status(ip);
-        let description = (data.description!.toRaw().length > 0) ? data.description!.toRaw() : '_ _';
-        let playerNames = (data.samplePlayers != null) ? data.samplePlayers.map(p => p.name).join(', ') : '_ _';
-
+        let description = (data.description != null && data.description.toRaw().length > 0) ? data.description.toRaw() : '_ _';
+        let playerNames = (data.samplePlayers != null && data.samplePlayers.length > 0) ? data.samplePlayers.map(p => p.name).join(', ') : '_ _';
+        
         embed.setColor('#00FF00')
             .setAuthor('ONLINE', 'https://i.imgur.com/JytGYe6.png')
             .addField('Descrição', description, true)
