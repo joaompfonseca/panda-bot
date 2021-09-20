@@ -14,6 +14,11 @@ export class PandaInteractionMessage extends PandaMessage {
         this.int = int;
     }
 
+    async delete(): Promise<PandaMessage> {
+        await this.int.deleteReply();
+        return this;
+    }
+
     async edit(out: string | Object): Promise<PandaMessage> {
         let startTime = Date.now();
         await this.int.editReply(out);
