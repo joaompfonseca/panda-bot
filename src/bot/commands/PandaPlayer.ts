@@ -1,10 +1,13 @@
+import { MessageActionRow, MessageButton, MessageComponentInteraction, MessageEmbed, MessageOptions } from 'discord.js';
 import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from '@discordjs/voice';
 import { SoundCloud, Track as Soundcloud_Track } from 'scdl-core'; const scdl = new SoundCloud(); scdl.connect();
 import spinfo, { Preview as Spotify_Track, Tracks as Spotify_Playlist_Track } from 'spotify-url-info';
 import ytinfo, { YoutubeVideo as Youtube_Video, Playlist as Youtube_Playlist, YoutubeSearchResults as Youtube_Query } from 'youtube-scrapper';
 import ytdl from 'ytdl-core-discord';
+import { queuePageSize } from '../config.js';
+import { unknown } from './general.js';
+import { PandaAudio, PandaQueueFrame, PandaRequest, PandaRequestTypes } from '../interfaces.js';
 import { PandaChat } from './PandaChat.js';
-import { PandaAudio, PandaRequest, PandaRequestTypes } from '../interfaces.js';
 import { mError, mPanda } from './messages.js';
 
 export class PandaPlayer implements PandaAudio {
@@ -14,6 +17,7 @@ export class PandaPlayer implements PandaAudio {
     guildId: string;
     player: AudioPlayer;
     queue: PandaRequest[];
+    queueFrames: PandaQueueFrame[];
     resource: AudioResource | null;
     vcId: string | null;
 
@@ -30,6 +34,7 @@ export class PandaPlayer implements PandaAudio {
         this.guildId = guildId;
         this.player = createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Pause } });
         this.queue = [];
+        this.queueFrames = [];
         this.resource = null;
         this.vcId = null;
     }
@@ -89,7 +94,7 @@ export class PandaPlayer implements PandaAudio {
                     if (vcId != null && vcId != this.vcId) { await this.connectTo(vcId); return; }
                     /* Clear vars */
                     this.connection = null;
-                    this.vcId = null; return;
+                    this.vcId = null;
                 });
             });
             return;
@@ -457,16 +462,125 @@ export class PandaPlayer implements PandaAudio {
             /* Queue is empty -> return */
             if (this.queue.length == 0) { await this.chat.send(mPanda.getQueue.empty); return; }
 
-            /* Show first five requests in queue */
-            let num = (this.queue.length > 5) ? 5 : this.queue.length;
-            let str = mPanda.getQueue.playing(this.queue[0]);
-            for (let i = 1; i < num; i++) { str += `\n${mPanda.getQueue.next(this.queue[i])}`; }
-            if (this.queue.length > 5) { str += `\n+ \`${this.queue.length - num}\``; }
-            await this.chat.send(str); return;
+            /* Get queue page */
+            let { data, time } = await this.getQueuePage(1);
+
+            /* Send the message */
+            let msg = await this.chat.send(data);
+            /* Create the filter - time when this queue page was created */
+            let filter = (int: MessageComponentInteraction): boolean => {
+                return parseInt(int.customId.split('-')[0]) == time;
+            };
+            /* Create the collector */
+            let collector = this.chat.createMessageComponentCollector({
+                filter: filter,
+                idle: 1000 * 60 * 5 // 1000 * 60 * minutes
+            });
+            /* Collector listeners */
+            collector
+                .on('collect', async int => {
+                    /* Get time, page and command */
+                    let data = int.customId.split('-');
+                    let time: number = parseInt(data[0]);
+                    let page: number = parseInt(data[1]);
+                    let cmd: string | undefined = data[2];
+
+                    /* A command is provided */
+                    if (cmd != undefined) {
+                        /* Get User's vcId */
+                        let vcId = int.guild!.members.cache.get(int.user.id)!.voice.channelId;
+                        /* Execute a command */
+                        switch (cmd) {
+                            case 'clear':   await this.clear(this.chat, vcId); break;
+                            default:        await unknown(this.chat); break;    
+                        }
+                    }
+                    /* Get requested page of queue */
+                    int.update((await this.getQueuePage(page, time)).data);
+                })
+                .on('end', async () => {
+                    /* Delete messages associated to ended collectors */
+                    this.queueFrames.forEach(async f => { if (f.collector.ended) await f.msg.edit({ content: mPanda.getQueue.closed, embeds: [], components: [] }); });
+                    /* Remove ended collectors' frames from array */
+                    this.queueFrames = this.queueFrames.filter(f => !f.collector.ended);
+                });
+            /* Add collector and message to array */
+            this.queueFrames.push({ collector: collector, msg: msg }); return;
         }
         catch (e: any) {
             console.warn(e.message);
             await this.chat.send(mError.executeCmd); return;
+        }
+    }
+
+    /**
+     * Returns the requested queue page and the time this queue page was created.
+     * @param page starting in 1, the requested page number.
+     * @param time in seconds, when this queue page was created.
+     * @returns 
+     */
+    async getQueuePage(page: number, time?: number): Promise<{ data: MessageOptions, time: number }> {
+        /* Get the time of page creation if none is provided */
+        time = (time == undefined) ? Date.now() : time;
+        try {
+            /* Get array of requests to display */
+            let reqs: PandaRequest[] = [];
+            for (let p = page; p > 0; p--) {
+                reqs = this.queue.slice((p - 1) * queuePageSize, p * queuePageSize);
+                /* Array has requests -> break */
+                if (reqs.length > 0) { page = (p < 2) ? 1 : p; break; }
+            }
+            /* Get number of total pages */
+            let totalPages = (this.queue.length == 0 || this.queue.length % queuePageSize != 0) ? Math.floor(this.queue.length / queuePageSize) + 1 : this.queue.length / queuePageSize;
+
+            /* Create the string */
+            let str;
+            if (reqs.length == 0) {
+                /* Display empty queue message */
+                str = mPanda.getQueuePage.empty;
+            }
+            else {
+                /* Format requests */
+                str = reqs.map((req, pos) => mPanda.getQueuePage.request(req, (page - 1) * queuePageSize + pos)).join('\n');
+                /* Add pagination info */
+                str += `\n\n${mPanda.getQueuePage.pageCounter(page, totalPages)}`;
+            }
+            /* Create the string's embed */
+            let embed = new MessageEmbed({ description: str });
+
+            /* Create the buttons */
+            let btn_prev = new MessageButton({
+                customId: `${time}-${page - 1}`,
+                label: mPanda.getQueuePage.button.prev,
+                style: 'SECONDARY'
+            });
+            let btn_next = new MessageButton({
+                customId: `${time}-${page + 1}`,
+                label: mPanda.getQueuePage.button.next,
+                style: 'SECONDARY'
+            });
+            let btn_reload = new MessageButton({
+                customId: `${time}-${page}`,
+                label: mPanda.getQueuePage.button.reload,
+                style: 'SECONDARY'
+            });
+            let btn_clear = new MessageButton({
+                customId: `${time}-${page}-clear`,
+                label: mPanda.getQueuePage.button.clear,
+                style: 'SECONDARY'
+            });
+            /* Disable buttons according to current page */
+            if (page < 2) btn_prev.setDisabled();
+            if (page == totalPages) btn_next.setDisabled();
+            if (this.queue.length < 2) btn_clear.setDisabled();
+            /* Create the buttons' row */
+            let buttons = new MessageActionRow({ components: [btn_prev, btn_next, btn_reload, btn_clear] });
+
+            return { data: { embeds: [embed], components: [buttons] }, time };
+        }
+        catch (e: any) {
+            console.warn(e.message);
+            return { data: { content: mError.executeCmd, embeds: [], components: [] }, time };
         }
     }
 }

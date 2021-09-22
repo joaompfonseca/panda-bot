@@ -1,12 +1,20 @@
+import { InteractionCollector, MessageComponentInteraction, MessageOptions } from 'discord.js';
 import { VoiceConnection, AudioPlayer, AudioResource } from '@discordjs/voice';
-import { PandaPlayer } from './commands/PandaPlayer.js';
 import { PandaChat } from './commands/PandaChat.js';
+import { PandaMessage } from './commands/PandaMessage.js';
+import { PandaPlayer } from './commands/PandaPlayer.js';
 
 /* PandaRequestTypes */
 export enum PandaRequestTypes {
     SOUNDCLOUD_TRACK = 'soundcloud track',
     SPOTIFY_TRACK = 'spotify track',
     YOUTUBE_VIDEO = 'youtube video'
+}
+
+/* PandaQueueFrame */
+export interface PandaQueueFrame {
+    collector: InteractionCollector<MessageComponentInteraction>,
+    msg: PandaMessage
 }
 
 /* PandaRequest */
@@ -24,6 +32,7 @@ export interface PandaAudio {
     guildId: string;
     player: AudioPlayer;
     queue: PandaRequest[];
+    queueFrames: PandaQueueFrame[];
     resource: AudioResource | null;
     vcId: string | null;
 
@@ -38,6 +47,7 @@ export interface PandaAudio {
     skip(chat: PandaChat, vcId: string | null): Promise<void>;
     clear(chat: PandaChat, vcId: string | null): Promise<void>;
     getQueue(chat: PandaChat): Promise<void>;
+    getQueuePage(page: number, time?: number): Promise<{data: MessageOptions, time: number}>;
 }
 
 /* PandaGuild */

@@ -109,8 +109,18 @@ export const mPanda = {
         userNotVC: 'Não estás num canal de voz!'
     },
     getQueue: {
-        playing: (req: PandaRequest) => `Agora: \`${req.title}\`.`,
+        closed: 'Interface da playlist fechada por inatividade.',
+        empty: 'A minha playlist está vazia!'
+    },
+    getQueuePage: {
+        button: {
+            clear: '🧹',
+            next: '▶',
+            prev: '◀',
+            reload: '⭮'
+        },
         empty: 'A minha playlist está vazia!',
-        next: (req: PandaRequest) => `Depois: \`${req.title}\``
+        pageCounter: (current: number, total: number) => `Página ${current}/${total}`,
+        request: (req: PandaRequest, pos: number) => `${pos + 1}) ${req.title}`
     }
 }
