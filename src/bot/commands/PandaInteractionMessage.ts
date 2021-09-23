@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, MessagePayload, WebhookEditMessageOptions } from "discord.js";
 import { PandaMessage } from "./PandaMessage.js";
 
 export class PandaInteractionMessage extends PandaMessage {
@@ -14,16 +14,11 @@ export class PandaInteractionMessage extends PandaMessage {
         this.int = int;
     }
 
-    async delete(): Promise<PandaMessage> {
-        await this.int.deleteReply();
-        return this;
-    }
-
-    async edit(out: string | Object): Promise<PandaMessage> {
+    async edit(out: string | WebhookEditMessageOptions | MessagePayload): Promise<PandaMessage> {
         let startTime = Date.now();
         await this.int.editReply(out);
         let endTime = Date.now();
         let createdTimestamp = this.int.createdTimestamp + endTime - startTime;
-        return new PandaInteractionMessage(createdTimestamp, this.int);
+        return new PandaInteractionMessage(createdTimestamp, this.int); 
     }
 }

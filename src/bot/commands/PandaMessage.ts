@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Message, MessageEditOptions, MessagePayload } from "discord.js";
 
 export class PandaMessage {
     createdTimestamp: number;
@@ -14,13 +14,16 @@ export class PandaMessage {
         this.msg = msg;
     }
 
-    async delete(): Promise<PandaMessage> {
-        await this.msg!.delete();
-        return this;
-    }
-
-    async edit(out: string | Object): Promise<PandaMessage> {
-        let msg = await this.msg!.edit(out);
-        return new PandaMessage(msg.createdTimestamp, msg); 
+    async edit(out: string | MessageEditOptions | MessagePayload): Promise<PandaMessage> {
+        try {
+            let msg = await this.msg!.edit(out);
+            return new PandaMessage(msg!.createdTimestamp, msg);
+        }
+        catch (e: any) {
+            let msg = e.message;
+            /* Other Error */
+            if (!msg.startsWith('Unknown Message')) console.warn(e.message);
+            return this;
+        }
     }
 }
