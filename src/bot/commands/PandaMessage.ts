@@ -14,6 +14,18 @@ export class PandaMessage {
         this.msg = msg;
     }
 
+    async delete(): Promise<PandaMessage> {
+        try {
+            await this.msg!.delete();
+        }
+        catch (e: any) {
+            let msg = e.message;
+            /* Other Error */
+            if (!msg.startsWith('Unknown Message')) console.warn(e.message);
+        }
+        return this;
+    }
+
     async edit(out: string | MessageEditOptions | MessagePayload): Promise<PandaMessage> {
         try {
             let msg = await this.msg!.edit(out);

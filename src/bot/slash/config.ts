@@ -3,6 +3,16 @@ import { ApplicationCommandData } from "discord.js";
 export const commands: ApplicationCommandData[] = [
     /* General */
     {
+        name: 'game',
+        description: 'sugiro-te um jogo',
+        options: [{
+            name: 'jogos',
+            description: 'diz-me os teus jogos (separados por vírgulas)',
+            type: 'STRING',
+            required: false
+        }]
+    },
+    {
         name: 'help',
         description: 'é trivial'
     },
@@ -24,17 +34,11 @@ export const commands: ApplicationCommandData[] = [
             required: false
         }]
     },
-    {
-        name: 'game',
-        description: 'sugiro-te um jogo',
-        options: [{
-            name: 'jogos',
-            description: 'diz-me os teus jogos (separados por vírgulas)',
-            type: 'STRING',
-            required: false
-        }]
-    },
     /* Panda Player */
+    {
+        name: 'clear',
+        description: 'limpo o lixo na playlist'
+    },
     {
         name: 'join',
         description: 'dj panda ao serviço'
@@ -42,6 +46,10 @@ export const commands: ApplicationCommandData[] = [
     {
         name: 'leave',
         description: 'volto para o gabinete'
+    },
+    {
+        name: 'pause',
+        description: 'para kit-kat'
     },
     {
         name: 'play',
@@ -54,23 +62,21 @@ export const commands: ApplicationCommandData[] = [
         }]
     },
     {
-        name: 'pause',
-        description: 'para kit-kat'
-    },
-    {
-        name: 'unpause',
-        description: 'a festa continua'
+        name: 'queue',
+        description: 'mostro o que está na playlist',
+        options: [{
+            name: 'página',
+            description: 'diz-me a página em específico',
+            type: 'NUMBER',
+            required: false
+        }]
     },
     {
         name: 'skip',
         description: 'salto para a próximo som'
     },
     {
-        name: 'clear',
-        description: 'limpo o lixo na playlist'
-    },
-    {
-        name: 'queue',
-        description: 'mostro o que está na playlist'
+        name: 'unpause',
+        description: 'a festa continua'
     }
 ];

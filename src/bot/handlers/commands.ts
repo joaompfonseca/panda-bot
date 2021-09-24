@@ -17,22 +17,23 @@ import { game, help, info, mc, ping, unknown } from '../commands/general.js';
 export async function cmdHandler(client: Client, cmd: string, args: string, chat: PandaChat, guild: PandaGuild, time: number, vcId: string | null): Promise<void> {
     switch (cmd) {
         /* General */
+        case 'game':        await game(chat, args); break;
         case 'help':        await help(chat); break;
         case 'info':        await info(client, chat); break;
         case 'ping':        await ping(chat, time); break;
         case 'mc':          await mc(chat, args); break;
-        case 'game':        await game(chat, args); break;
         /* Panda Player */
+        case 'clear':       await guild.pandaPlayer.clear(chat, vcId); break;
         case 'join':        await guild.pandaPlayer.join(chat, vcId); break;
         case 'leave':
-        case 'disconnect':  await guild.pandaPlayer.leave(chat); break;
-        case 'play':        await guild.pandaPlayer.play(chat, vcId, args); break;
+        case 'disconnect':  await guild.pandaPlayer.leave(chat, vcId); break;
         case 'pause':       await guild.pandaPlayer.pause(chat, vcId); break;
+        case 'play':        await guild.pandaPlayer.play(chat, vcId, args); break;
+        case 'playlist':
+        case 'queue':       await guild.pandaPlayer.playlist(chat, args); break;
+        case 'skip':        await guild.pandaPlayer.skip(chat, vcId); break;
         case 'unpause':
         case 'resume':      await guild.pandaPlayer.unpause(chat, vcId); break;
-        case 'skip':        await guild.pandaPlayer.skip(chat, vcId); break;
-        case 'clear':       await guild.pandaPlayer.clear(chat, vcId); break;
-        case 'queue':       await guild.pandaPlayer.getQueue(chat); break;
         /* Invalid Command */
         default:            await unknown(chat); break;
     }

@@ -6,6 +6,26 @@ import { PandaChat } from './PandaChat.js';
 import { mError, mHelp, mPing, mGame, mInfo } from './messages.js';
 
 /**
+ * Sends a random game to the given chat.
+ * @param chat 
+ * @param args separated by commas, User given games to randomize.
+ * @returns 
+ */
+ export async function game(chat: PandaChat, args: string): Promise<void> {
+    let list = args.split(',').map(g => g.trim()).filter(g => g.length > 0);
+
+    /* Invalid arguments */
+    if (args.length != 0 && list.length == 0) { await chat.send(mError.invalidArgs); return; }
+    /* No arguments */
+    if (args.length == 0) list = mGame;
+
+    /* Generate a random index */
+    let index = Math.floor(Math.random() * list.length);
+
+    await chat.send(list[index]); return;
+}
+
+/**
  * Sends Bot's command info to the given chat.
  * @param chat
  * @returns
@@ -77,26 +97,6 @@ export async function mc(chat: PandaChat, args: string): Promise<void> {
     }
 
     await chat.send({ embeds: [embed] }); return;
-}
-
-/**
- * Sends a random game to the given chat.
- * @param chat 
- * @param args separated by commas, User given games to randomize.
- * @returns 
- */
-export async function game(chat: PandaChat, args: string): Promise<void> {
-    let list = args.split(',').map(g => g.trim()).filter(g => g.length > 0);
-
-    /* Invalid arguments */
-    if (args.length != 0 && list.length == 0) { await chat.send(mError.invalidArgs); return; }
-    /* No arguments */
-    if (args.length == 0) list = mGame;
-
-    /* Generate a random index */
-    let index = Math.floor(Math.random() * list.length);
-
-    await chat.send(list[index]); return;
 }
 
 /**
