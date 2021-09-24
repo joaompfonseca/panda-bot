@@ -1,10 +1,10 @@
-import { CommandInteraction, TextBasedChannels } from "discord.js";
+import { CommandInteraction, MessageComponentInteraction, TextBasedChannels } from "discord.js";
 import { PandaChat } from "./PandaChat.js";
 import { PandaInteractionMessage } from "./PandaInteractionMessage.js";
 import { PandaMessage } from "./PandaMessage.js";
 
 export class PandaInteractionChat extends PandaChat {
-    int: CommandInteraction;
+    int: CommandInteraction | MessageComponentInteraction;
     replied: boolean;
 
     /**
@@ -12,7 +12,7 @@ export class PandaInteractionChat extends PandaChat {
      * @param chat 
      * @param int 
      */
-    constructor(chat: TextBasedChannels, int: CommandInteraction) {
+    constructor(chat: TextBasedChannels, int: CommandInteraction | MessageComponentInteraction) {
         super(chat);
         this.int = int;
         this.replied = false;

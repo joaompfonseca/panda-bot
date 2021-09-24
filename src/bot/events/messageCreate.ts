@@ -21,7 +21,7 @@ export async function messageCreate(client: Client, msg: Message): Promise<void>
     const cmd = (argsPos == -1) ? content.substring(prefix.length) : content.substring(prefix.length, argsPos);
     const args = (argsPos == -1) ? '' : content.substring(argsPos).trimStart();
     const chat = new PandaChat(msg.channel);
-    const guild = guildHandler(msg.guildId!, chat, msg.guild!.voiceAdapterCreator);
+    const guild = guildHandler(chat, client, msg.guild!);
     const time = msg.createdTimestamp;
     const vcId = msg.member!.voice.channelId;
 

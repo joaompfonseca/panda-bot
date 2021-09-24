@@ -13,8 +13,9 @@ export async function client(): Promise<void> {
         intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES]
     });
 
-    client.on('ready', () => ready(client));
-    client.on('messageCreate', async msg => await messageCreate(client, msg));
-    client.on('interactionCreate', async int => await interactionCreate(client, int));
+    client
+        .on('ready', () => ready(client))
+        .on('messageCreate', async msg => await messageCreate(client, msg))
+        .on('interactionCreate', async int => await interactionCreate(client, int));
     await client.login(process.env.TOKEN); return;
 }

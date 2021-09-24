@@ -16,7 +16,7 @@ export async function interactionCreate(client: Client, int: Interaction): Promi
     const cmd = int.commandName;
     const args = (int.options.data.length == 0) ? '' : int.options.data[0].value!.toString();
     const chat = new PandaInteractionChat(int.channel!, int);
-    const guild = guildHandler(int.guildId!, chat, int.guild!.voiceAdapterCreator);
+    const guild = guildHandler(chat, client, int.guild!);
     const time = int.createdTimestamp;
     const vcId = (int.guild!.voiceStates.cache.get(int.member!.user.id) == undefined) ? null : int.guild!.voiceStates.cache.get(int.member!.user.id)!.channelId;
 
