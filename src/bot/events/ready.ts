@@ -7,8 +7,9 @@ import { registerSlash } from '../slash/register.js';
  * @param client 
  * @returns
  */
-export function ready(client: Client): void {
+export async function ready(client: Client): Promise<void> {
     console.log(`Logged in as ${client.user!.tag}!`);
-    /* Register slash commands */
-    if (regSlash) registerSlash(client.application!.commands); return;
+    /* Register (/) commands */
+    if (regSlash) { await registerSlash(client.application!.commands); }
+    return;
 }
