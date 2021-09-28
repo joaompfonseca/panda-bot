@@ -1,3 +1,5 @@
+import { type } from 'os';
+import { Playlist as SoundCloud_Playlist } from 'scdl-core';
 import { Playlist as Youtube_Playlist } from 'youtube-scrapper';
 import { prefix } from '../config.js';
 import { PandaRequest } from '../interfaces.js';
@@ -8,23 +10,32 @@ export const mError = {
     unknownCmd: 'Esse comando não existe. Pede ajuda para não passares vergonha novamente.'
 };
 
+export const mGame = [
+    'CS:GO',
+    'Team Fortress 2',
+    'Portal 2',
+    'Minecraft',
+    'GTA V',
+    'Xadrez'
+];
+
 export const mHelp: { [category: string]: { [term: string]: string } } = {
     Gerais: {
+        'game [..]?, [..]?,..': 'sugiro-te um jogo',
         help: 'é trivial',
         info: 'informação sobre mim',
         ping: 'digo pong',
-        'mc [..]?': 'status do servidor',
-        'game [..]?, [..]?,..': 'sugiro-te um jogo'
+        'mc [..]?': 'status do servidor'
     },
     'Panda Player': {
-        join: 'dj panda ao serviço',
-        'leave/disconnect': 'volto para o gabinete',
-        'play [..]': 'dou-te música',
-        pause: 'para kit-kat',
-        'unpause/resume': 'a festa continua',
-        skip: 'salto para a próximo som',
         clear: 'limpo o lixo na playlist',
-        queue: 'mostro o que está na playlist'
+        join: 'dj panda ao serviço',
+        'leave/disconnect/stop': 'volto para o gabinete',
+        pause: 'para kit-kat',
+        'play [..]': 'dou-te música',
+        'queue/playlist [..]?': 'mostro o que está na playlist',
+        skip: 'salto para a próximo som',
+        'unpause/resume': 'a festa continua'
     }
 };
 
@@ -43,84 +54,114 @@ export const mPing = {
     done: (ping: number) => `Pong! ${ping} ms`
 };
 
-export const mGame = [
-    'CS:GO',
-    'Team Fortress 2',
-    'Portal 2',
-    'Minecraft',
-    'GTA V',
-    'Xadrez'
-];
-
 export const mPanda = {
-    join: {
-        already: (vcId: string) => `Já estou conectado a <#${vcId}>! Não tens olhos na vista?`,
-        paused: 'Estou em pausa!',
-        userNotVC: 'Como é que queres que eu entre se não estás num canal de voz?'
+    addToPlaylist: {
+        invalidUrl: 'O link que me forneceste é inválido!',
+        unavailable: 'O teu pedido encontra-se indisponível para mim.',
+        success: (req: string) => `Adicionei \`${req}\` à playlist.`,
+    },
+    clear: {
+        already: 'Não há nada para limpar!',
+        botNotVC: 'Não estou num canal de voz!',
+        notSameVC: 'Não estamos no mesmo canal de voz!',
+        success: (num: number) => `Limpei \`${num}\` ${(num == 1) ? 'pedido' : 'pedidos'} da playlist.`,
+        userNotVC: 'Não estás num canal de voz!'
+    },
+    collect: {
+
     },
     connectTo: {
         connected: (vcId: string) => `Conectado a <#${vcId}>.`,
         disconnected: (vcId: string) => `Desconectado de <#${vcId}>.`
     },
-    leave: {
-        botNotVC: 'Como é que queres que eu saia se não estou num canal de voz?'
+    getPlayerPanel: {
+        noNextRequest: '🔇 Nada. Pede-me um som!',
+        queue: {
+            emoji: '📋',
+            label: 'Lista'
+        },
+        request: (req: PandaRequest) => `🔊 ${(req.title.length > 57) ? (req.title.substring(0, 57 - 3) + '...') : (req.title + ' '.repeat(57 - req.title.length))}`,
+        skip: {
+            emoji: '⏭',
+            label: 'Saltar'
+        },
+        stop: {
+            emoji: '⏹',
+            label: 'Parar'
+        },
+        toggle: {
+            emoji: '⏯',
+            label: 'Tocar/Pausar'
+        }
     },
-    play: {
-        emptyQuery: 'Nem sei o que te faço, então pedes-me para tocar nada?',
-        userNotVC: 'Não me podes pedir discos antes de entrares num canal de voz!'
-    },
-    addToQueue: {
-        invalidUrl: 'O link que me forneceste é inválido!',
-        progress: (num: number) => `Estou a adicionar estes sons à playlist... \`${num}\` ${(num == 1) ? 'restante' : 'restantes'}.`,
-        unavailable: 'O teu pedido encontra-se indisponível para mim.',
-        success: (req: PandaRequest | Youtube_Playlist) => `Adicionei \`${req.title}\` à playlist.`,
-        successNum: (num: number) => `Adicionei \`${num}\` ${(num == 1) ? 'som' : 'sons'} à playlist.`
-    },
-    start: {
-        ageRestricted: 'Este som tem uma restrição de idade!',
+    getPlaylistPage: {
+        clear: {
+            emoji: '🧹',
+            label: 'Limpar'
+        },
         empty: 'A minha playlist está vazia!',
-        ended: (req: PandaRequest) => `Terminou: \`${req.title}\`.`,
+        info: (page: number, totalPages: number, totalRequests: number, totalDuration: string) => `Página ${page}/${totalPages} | ${totalRequests} ${(totalRequests == 1)? 'som' : 'sons'} | Duração total [${totalDuration}]`,
+        next: {
+            emoji: '▶',
+            label: 'Seguinte'
+        },
+        previous: {
+            emoji: '◀',
+            label: 'Anterior'
+        },
+        reload: {
+            emoji: '🔄',
+            label: 'Atualizar'
+        },
+        request: (req: PandaRequest, pos: number) => `${pos}) ${(req.title.length > 56 - pos.toString().length - req.formatedDuration.length) ? (req.title.substring(0, 56 - pos.toString().length - req.formatedDuration.length - 3) + '...') : (req.title + ' '.repeat(56 - pos.toString().length - req.formatedDuration.length - req.title.length))} [${req.formatedDuration}]`
+    },
+    join: {
+        already: (vcId: string) => `Já estou conectado a <#${vcId}>! Não tens olhos na vista?`,
         paused: 'Estou em pausa!',
-        playing: (req: PandaRequest) => `Agora: \`${req.title}\`.`,
-        skipped: (req: PandaRequest) => `Saltei: \`${req.title}\`.`
+        userNotVC: 'Não estás num canal de voz!'
+    },
+    leave: {
+        botNotVC: 'Não estou num canal de voz!',
+        notSameVC: 'Não estamos no mesmo canal de voz!',
+        userNotVC: 'Não estás num canal de voz!'
     },
     pause: {
         already: 'Eu já estou na minha pausa, não me chateies.',
         botNotVC: 'Não estou num canal de voz!',
         notPlaying: 'Não posso parar se nem sequer comecei!',
+        notSameVC: 'Não estamos no mesmo canal de voz!',
         userNotVC: 'Não estás num canal de voz!'
     },
-    resume: {
-        already: 'Eu já estou a tocar, não me chateies.',
-        botNotVC: 'Não estou num canal de voz!',
-        notPlaying: 'Não posso continuar se nem sequer comecei!',
+    play: {
+        emptyQuery: 'Nem sei o que te faço, então pedes-me para tocar nada?',
         userNotVC: 'Não estás num canal de voz!'
+    },
+    playlist: {
+
     },
     skip: {
         botNotVC: 'Não estou num canal de voz!',
         empty: 'A minha playlist está vazia!',
+        notSameVC: 'Não estamos no mesmo canal de voz!',
         success: (req: PandaRequest) => `Saltei: \`${req.title}\`.`,
         userNotVC: 'Não estás num canal de voz!'
     },
-    clear: {
-        already: 'Não há nada para limpar!',
+    start: {
+        ageRestricted: 'Este som tem uma restrição de idade!',
+        empty: 'A minha playlist está vazia!',
+        ended: (req: PandaRequest) => `Terminou: \`${req.title}\`.`,
+        paused: 'Estou em pausa!'
+    },
+    stop: {
         botNotVC: 'Não estou num canal de voz!',
-        success: (num: number) => `Limpei \`${num}\` ${(num == 1) ? 'pedido' : 'pedidos'} da playlist.`,
+        notSameVC: 'Não estamos no mesmo canal de voz!',
         userNotVC: 'Não estás num canal de voz!'
     },
-    getQueue: {
-        closed: 'Interface da playlist fechada por inatividade.',
-        empty: 'A minha playlist está vazia!'
-    },
-    getQueuePage: {
-        button: {
-            clear: '🧹',
-            next: '▶',
-            prev: '◀',
-            reload: '⭮'
-        },
-        empty: 'A minha playlist está vazia!',
-        pageCounter: (current: number, total: number) => `Página ${current}/${total}`,
-        request: (req: PandaRequest, pos: number) => `${pos + 1}) ${req.title}`
+    unpause: {
+        already: 'Eu já estou a tocar, não me chateies.',
+        botNotVC: 'Não estou num canal de voz!',
+        notPlaying: 'Não posso continuar se nem sequer comecei!',
+        notSameVC: 'Não estamos no mesmo canal de voz!',
+        userNotVC: 'Não estás num canal de voz!'
     }
 }

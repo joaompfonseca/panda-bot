@@ -15,15 +15,34 @@ export class PandaInteractionMessage extends PandaMessage {
     }
 
     async delete(): Promise<PandaMessage> {
-        await this.int.deleteReply();
-        return this;
+        try {
+            await this.int.deleteReply();
+            this.deleted = true;
+            return this;
+        }
+        catch (e: any) {
+            let msg = e.message;
+            /* Other Error */
+            if (!msg.startsWith('Unknown Message')) console.warn(e.message);
+            return this;
+        }
     }
 
     async edit(out: string | WebhookEditMessageOptions | MessagePayload): Promise<PandaMessage> {
-        let startTime = Date.now();
-        await this.int.editReply(out);
-        let endTime = Date.now();
-        let createdTimestamp = this.int.createdTimestamp + endTime - startTime;
-        return new PandaInteractionMessage(createdTimestamp, this.int);
+        try {
+            if (this.deleted) return this;
+
+            let startTime = Date.now();
+            await this.int.editReply(out);
+            let endTime = Date.now();
+            let createdTimestamp = this.int.createdTimestamp + endTime - startTime;
+            return new PandaInteractionMessage(createdTimestamp, this.int);
+        }
+        catch (e: any) {
+            let msg = e.message;
+            /* Other Error */
+            if (!msg.startsWith('Unknown Message')) console.warn(e.message);
+            return this;
+        }
     }
 }

@@ -1,6 +1,24 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2021-09-28
+### Added
+- New `leave` command alias: `stop`.
+- New player panel when song is playing with `play/pause`, `skip`, `stop` and `queue` buttons.  
+- New `queue` command interface. If opened through the player panel, buttons for page navigation, refreshing and clearing will appear, but only to the user that pressed the button.
+- Support for Soundcloud albums and playlists.
+
+### Changed
+- Now registering (/) commands checks for deleted commands and removes them.
+- Now the default Minecraft server ip address is changed in Bot's `config` file instead of the `.env` file. 
+- Now `leave` command clears queue.
+- Now `queue` command accepts user given page number.
+- Now adding playlists from Spotify is faster.
+
+### Fixed
+- `mc` command not correctly handing null description and samplePlayers.
+- Typo in changelog.
+
 ## [0.3.3] - 2021-09-17
 ### Fixed
 - `mc` command reporting Minecraft server as offline when no players were online.
@@ -39,7 +57,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Description in `README.md` and `package.json`.
-- Now `game` command accepts user given ip address, defaults to the one in `.env` if none is provided.
+- Now `mc` command accepts user given ip address, defaults to the one in `.env` if none is provided.
 - Now `play` command supports Spotify tracks, albums and playlists.
 
 ## [0.1.1] - 2021-08-31
