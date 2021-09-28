@@ -1,7 +1,7 @@
 import { Client, InteractionCollector, MessageActionRow, MessageComponentInteraction, MessageEmbed } from 'discord.js';
 import { VoiceConnection, AudioPlayer, AudioResource } from '@discordjs/voice';
-import { PandaChat } from './commands/PandaChat.js';
-import { PandaMessage } from './commands/PandaMessage.js';
+import { PandaChat } from './handlers/PandaChat.js';
+import { PandaMessage } from './handlers/PandaMessage.js';
 import { PandaPlayer } from './commands/PandaPlayer.js';
 
 /* PandaRequest */

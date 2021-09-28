@@ -1,6 +1,6 @@
 import { Client } from 'discord.js';
 import { PandaGuild } from '../interfaces.js';
-import { PandaChat } from '../commands/PandaChat.js';
+import { PandaChat } from './PandaChat.js';
 import { game, help, info, mc, ping, unknown } from '../commands/general.js';
 
 /**

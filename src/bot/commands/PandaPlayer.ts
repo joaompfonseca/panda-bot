@@ -8,8 +8,8 @@ import { queuePageSize } from '../config.js';
 import { formatDuration, formatTextSyntax, spdl } from '../util.js';
 import { mError, mPanda } from './messages.js';
 import { PandaAudio, PandaRequest, PandaRequestTypes } from '../interfaces.js';
-import { PandaMessage } from './PandaMessage.js';
-import { PandaChat } from './PandaChat.js';
+import { PandaMessage } from '../handlers/PandaMessage.js';
+import { PandaChat } from '../handlers/PandaChat.js';
 
 export class PandaPlayer implements PandaAudio {
     adapterCreator: DiscordGatewayAdapterCreator;

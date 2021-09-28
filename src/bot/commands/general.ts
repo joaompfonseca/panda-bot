@@ -2,7 +2,7 @@ import { MessageEmbed, Client } from 'discord.js';
 import msu from 'minecraft-server-util';
 import dotenv from 'dotenv'; dotenv.config();
 import { mcServer } from '../config.js';
-import { PandaChat } from './PandaChat.js';
+import { PandaChat } from '../handlers/PandaChat.js';
 import { mError, mHelp, mPing, mGame, mInfo } from './messages.js';
 
 /**

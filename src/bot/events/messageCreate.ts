@@ -2,7 +2,7 @@ import { Client, Message } from 'discord.js';
 import { prefix } from '../config.js';
 import { guildHandler } from '../handlers/guilds.js';
 import { cmdHandler } from '../handlers/commands.js';
-import { PandaChat } from '../commands/PandaChat.js';
+import { PandaChat } from '../handlers/PandaChat.js';
 
 /**
  * Runs when client's "messageCreate" event is triggered.

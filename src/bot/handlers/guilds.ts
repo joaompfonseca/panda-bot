@@ -1,7 +1,7 @@
 import { Client, Guild } from 'discord.js';
 import { PandaGuild, PandaGuilds } from '../interfaces.js';
 import { PandaPlayer } from '../commands/PandaPlayer.js';
-import { PandaChat } from '../commands/PandaChat.js';
+import { PandaChat } from './PandaChat.js';
 
 let guilds: PandaGuilds = {};
 
