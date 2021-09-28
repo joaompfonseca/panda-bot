@@ -1,4 +1,4 @@
-import { Client, Guild, InteractionCollector, Message, MessageActionRow, MessageButton, MessageComponentInteraction, MessageEmbed } from 'discord.js';
+import { Client, Guild, InteractionCollector, MessageActionRow, MessageButton, MessageComponentInteraction, MessageEmbed } from 'discord.js';
 import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from '@discordjs/voice';
 import { SoundCloud, Track as Soundcloud_Track, Playlist as Soundcloud_Playlist } from 'scdl-core'; const scdl = new SoundCloud(); scdl.connect();
 import spinfo, { Tracks as Spotify_Playlist_Track } from 'spotify-url-info';
@@ -405,7 +405,7 @@ export class PandaPlayer implements PandaAudio {
     /**
      * Returns requested queue page.
      * @param page User/Interaction given queue page number.
-     * @param ephemeral
+     * @param showButtons
      * @returns 
      */
     getPlaylistPage(page: number, showButtons: boolean = false): { components: MessageActionRow[], embeds: MessageEmbed[] } {

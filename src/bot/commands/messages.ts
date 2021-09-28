@@ -1,6 +1,3 @@
-import { type } from 'os';
-import { Playlist as SoundCloud_Playlist } from 'scdl-core';
-import { Playlist as Youtube_Playlist } from 'youtube-scrapper';
 import { prefix } from '../config.js';
 import { PandaRequest } from '../interfaces.js';
 
