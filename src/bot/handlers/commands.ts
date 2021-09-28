@@ -25,15 +25,16 @@ export async function cmdHandler(client: Client, cmd: string, args: string, chat
         /* Panda Player */
         case 'clear':       await guild.pandaPlayer.clear(chat, vcId); break;
         case 'join':        await guild.pandaPlayer.join(chat, vcId); break;
+        case 'disconnect':
         case 'leave':
-        case 'disconnect':  await guild.pandaPlayer.leave(chat, vcId); break;
+        case 'stop':        await guild.pandaPlayer.leave(chat, vcId); break;
         case 'pause':       await guild.pandaPlayer.pause(chat, vcId); break;
         case 'play':        await guild.pandaPlayer.play(chat, vcId, args); break;
         case 'playlist':
         case 'queue':       await guild.pandaPlayer.playlist(chat, args); break;
         case 'skip':        await guild.pandaPlayer.skip(chat, vcId); break;
-        case 'unpause':
-        case 'resume':      await guild.pandaPlayer.unpause(chat, vcId); break;
+        case 'resume':
+        case 'unpause':      await guild.pandaPlayer.unpause(chat, vcId); break;
         /* Invalid Command */
         default:            await unknown(chat); break;
     }
