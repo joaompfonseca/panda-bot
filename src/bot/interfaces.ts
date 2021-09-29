@@ -34,7 +34,7 @@ export interface PandaAudio {
     resource: AudioResource | null;
     vcId: string | null;
 
-    addToPlaylist(req: string): Promise<void>;
+    addToPlaylist(req: string): Promise<boolean>;
     clear(chat: PandaChat, vcId: string | null): Promise<void>;
     collect(int: MessageComponentInteraction): Promise<void>;
     connectTo(vcId: string): Promise<void>;

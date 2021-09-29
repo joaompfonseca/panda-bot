@@ -53,7 +53,7 @@ export class PandaPlayer implements PandaAudio {
      * @param req 
      * @returns 
      */
-    async addToPlaylist(req: string): Promise<void> {
+    async addToPlaylist(req: string): Promise<boolean> {
         try {
             let data: Soundcloud_Track | Soundcloud_Playlist | Spotify_Playlist_Track[] | Youtube_Video | Youtube_Playlist | Youtube_Query; let pandaRequest: PandaRequest;
             /* Request is a Soundcloud track (link) */
@@ -179,25 +179,29 @@ export class PandaPlayer implements PandaAudio {
                 /* Add request to queue */
                 this.queue.push(pandaRequest);
                 await this.chat.send(mPanda.addToPlaylist.success(pandaRequest.title));
-            } return;
+            }
+            return true;
         }
         catch (e: any) {
             let msg: string = (e.message == undefined) ? e : e.message;
             /* Not found -> return */
-            if (msg.startsWith('Cannot read properties of undefined')) { await this.chat.send(mPanda.addToPlaylist.notFound); return; }
+            if (msg.startsWith('Cannot read properties of undefined')) { await this.chat.send(mPanda.addToPlaylist.notFound); }
             /* Invalid Url -> return */
-            if (msg.startsWith(`Cannot read property 'videoId' of undefined`) ||
+            else if (msg.startsWith(`Cannot read property 'videoId' of undefined`) ||
                 msg.startsWith('Invalid url') ||
-                msg.startsWith('Video id')) { await this.chat.send(mPanda.addToPlaylist.invalidUrl); return; }
+                msg.startsWith('Video id')) { await this.chat.send(mPanda.addToPlaylist.invalidUrl); }
             /* Unavailable -> return */
-            if (msg.startsWith('adaptationSet.Representation is not iterable') ||
+            else if (msg.startsWith('adaptationSet.Representation is not iterable') ||
                 msg.startsWith(`Cannot read property 'title' of undefined`) ||
                 msg.startsWith('Invalid ids') ||
                 msg.startsWith('Unexpected token ;') ||
-                msg.startsWith('Video unavailable')) { await this.chat.send(mPanda.addToPlaylist.unavailable); return; }
+                msg.startsWith('Video unavailable')) { await this.chat.send(mPanda.addToPlaylist.unavailable); }
             /* Other Error */
+            else {
             console.warn(`PandaPlayer [addToPlaylist] - ${msg}`);
-            await this.chat.send(mError.executeCmd); return;
+                await this.chat.send(mError.executeCmd);
+            }
+            return false;
         }
     }
 
@@ -571,6 +575,9 @@ export class PandaPlayer implements PandaAudio {
             if (req.length == 0) { await this.chat.send(mPanda.play.emptyQuery); return; }
             /* Bot is in a different vc of User and is playing -> return */
             if (this.vcId != null && this.vcId != vcId && this.player.state.status != AudioPlayerStatus.Idle) { await this.chat.send(mPanda.play.notSameVC); return; }
+
+            /* Add request to queue */
+            if (!await this.addToPlaylist(req)) return;
 
             /* Bot is in a different vc of User -> leave current vc */
             if (this.vcId != null && this.vcId != vcId) this.connection!.disconnect();
