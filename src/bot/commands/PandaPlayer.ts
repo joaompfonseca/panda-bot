@@ -485,9 +485,11 @@ export class PandaPlayer implements PandaAudio {
             if (vcId == null) { await this.chat.send(mPanda.join.userNotVC); return; }
             /* Bot is in the same vc as User -> return */
             if (this.vcId == vcId) { await this.chat.send(mPanda.join.already(this.vcId)); return; }
+            /* Bot is in a different vc of User and is playing -> return */
+            if (this.vcId != null && this.vcId != vcId && this.player.state.status != AudioPlayerStatus.Idle) { await this.chat.send(mPanda.join.playing(this.vcId)); return; }
 
             /* Bot is in a different vc of User -> leave current vc */
-            if (this.vcId != null && this.vcId != vcId) await this.leave(chat, this.vcId);
+            if (this.vcId != null && this.vcId != vcId) this.connection!.disconnect();
             /* Create a connection */
             await this.connectTo(vcId); return;
         }
@@ -565,9 +567,11 @@ export class PandaPlayer implements PandaAudio {
             if (vcId == null) { await this.chat.send(mPanda.play.userNotVC); return; }
             /* Request is empty -> return */
             if (req.length == 0) { await this.chat.send(mPanda.play.emptyQuery); return; }
+            /* Bot is in a different vc of User and is playing -> return */
+            if (this.vcId != null && this.vcId != vcId && this.player.state.status != AudioPlayerStatus.Idle) { await this.chat.send(mPanda.play.notSameVC); return; }
 
             /* Bot is in a different vc of User -> leave current vc */
-            if (this.vcId != null && this.vcId != vcId) await this.leave(chat, vcId);
+            if (this.vcId != null && this.vcId != vcId) this.connection!.disconnect();
             /* Bot is not in a vc or is in a different vc of User -> create a connection */
             if (this.vcId == null || this.vcId != vcId) await this.connectTo(vcId);
 

@@ -114,7 +114,7 @@ export const mPanda = {
     },
     join: {
         already: (vcId: string) => `Já estou conectado a <#${vcId}>! Não tens olhos na vista?`,
-        paused: 'Estou em pausa!',
+        playing: (vcId: string) => `Não posso entrar no teu canal de voz porque estou a tocar um som em <#${vcId}>!`,
         userNotVC: 'Não estás num canal de voz!'
     },
     leave: {
@@ -131,6 +131,7 @@ export const mPanda = {
     },
     play: {
         emptyQuery: 'Nem sei o que te faço, então pedes-me para tocar nada?',
+        notSameVC: 'Não estamos no mesmo canal de voz!',
         userNotVC: 'Não estás num canal de voz!'
     },
     playlist: {
