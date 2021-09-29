@@ -110,7 +110,7 @@ export const mPanda = {
             emoji: '🔄',
             label: 'Atualizar'
         },
-        request: (req: PandaRequest, pos: number) => `${pos}) ${(req.title.length > 56 - pos.toString().length - req.formatedDuration.length) ? (req.title.substring(0, 56 - pos.toString().length - req.formatedDuration.length - 3) + '...') : (req.title + ' '.repeat(56 - pos.toString().length - req.formatedDuration.length - req.title.length))} [${req.formatedDuration}]`
+        request: (pos: number, req: PandaRequest) => `${pos}) ${(req.title.length > 56 - pos.toString().length - req.formatedDuration.length) ? (req.title.substring(0, 56 - pos.toString().length - req.formatedDuration.length - 3) + '...') : (req.title + ' '.repeat(56 - pos.toString().length - req.formatedDuration.length - req.title.length))} [${req.formatedDuration}]`
     },
     join: {
         already: (vcId: string) => `Já estou conectado a <#${vcId}>! Não tens olhos na vista?`,

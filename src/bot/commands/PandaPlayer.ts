@@ -430,7 +430,7 @@ export class PandaPlayer implements PandaAudio {
             }
             else {
                 /* Format requests */
-                str = reqs.map((req, idx) => mPanda.getPlaylistPage.request(req, (page - 1) * queuePageSize + idx + 1)).join('\n');
+                str = reqs.map((req, idx) => mPanda.getPlaylistPage.request((page - 1) * queuePageSize + idx + 1, req)).join('\n');
                 /* Add info */
                 str += `\n\n${mPanda.getPlaylistPage.info(page, totalPages, this.queue.length, totalDuration)}`;
             }
