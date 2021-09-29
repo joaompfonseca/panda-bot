@@ -54,6 +54,8 @@ export const mPing = {
 export const mPanda = {
     addToPlaylist: {
         invalidUrl: 'O link que me forneceste é inválido!',
+        notFound: 'Não encontrei nada que correspondesse ao teu pedido.',
+        success: (req: string) => `Adicionei \`${req}\` à playlist.`,
         unavailable: 'O teu pedido encontra-se indisponível para mim.',
         success: (req: string) => `Adicionei \`${req}\` à playlist.`,
     },
