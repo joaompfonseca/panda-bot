@@ -183,16 +183,18 @@ export class PandaPlayer implements PandaAudio {
         }
         catch (e: any) {
             let msg: string = (e.message == undefined) ? e : e.message;
+            /* Not found -> return */
+            if (msg.startsWith('Cannot read properties of undefined')) { await this.chat.send(mPanda.addToPlaylist.notFound); return; }
             /* Invalid Url -> return */
-            if (msg.startsWith(`Cannot read properties of undefined`) ||
-                msg.startsWith(`Cannot read property 'videoId' of undefined`) ||
+            if (msg.startsWith(`Cannot read property 'videoId' of undefined`) ||
                 msg.startsWith('Invalid url') ||
                 msg.startsWith('Video id')) { await this.chat.send(mPanda.addToPlaylist.invalidUrl); return; }
             /* Unavailable -> return */
             if (msg.startsWith('adaptationSet.Representation is not iterable') ||
                 msg.startsWith(`Cannot read property 'title' of undefined`) ||
                 msg.startsWith('Invalid ids') ||
-                msg.startsWith('Unexpected token ;')) { await this.chat.send(mPanda.addToPlaylist.unavailable); return; }
+                msg.startsWith('Unexpected token ;') ||
+                msg.startsWith('Video unavailable')) { await this.chat.send(mPanda.addToPlaylist.unavailable); return; }
             /* Other Error */
             console.warn(`PandaPlayer [addToPlaylist] - ${msg}`);
             await this.chat.send(mError.executeCmd); return;
