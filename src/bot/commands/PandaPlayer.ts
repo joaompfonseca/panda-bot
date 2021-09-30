@@ -180,6 +180,12 @@ export class PandaPlayer implements PandaAudio {
                 this.queue.push(pandaRequest);
                 await this.chat.send(mPanda.addToPlaylist.success(pandaRequest.title));
             }
+
+            /* Remove player panel */
+            if (this.playerPanelMsg != null) await this.playerPanelMsg.delete();
+            /* Create new player panel */
+            if (this.player.state.status == AudioPlayerStatus.Playing || this.player.state.status == AudioPlayerStatus.Paused) { this.playerPanelMsg = await this.chat.send(this.getPlayerPanel()); }
+
             return true;
         }
         catch (e: any) {
@@ -230,8 +236,8 @@ export class PandaPlayer implements PandaAudio {
             this.queue = (this.player.state.status != AudioPlayerStatus.Idle) ? [this.queue[0]] : [];
             await this.chat.send(mPanda.clear.success(numClear));
 
-            /* A panel player was created and it wasn't deleted -> update player panel */
-            if (this.playerPanelMsg != null && !this.playerPanelMsg.deleted) { await this.playerPanelMsg!.edit(this.getPlayerPanel()); }
+            /* Update player panel */
+            if (this.playerPanelMsg != null) await this.playerPanelMsg.edit(this.getPlayerPanel());
             return;
         }
         catch (e: any) {
@@ -328,7 +334,7 @@ export class PandaPlayer implements PandaAudio {
                 this.connection!.once(VoiceConnectionStatus.Disconnected, async () => {
                     await this.chat.send(mPanda.connectTo.disconnected(this.vcId!));
                     /* Remove player panel */
-                    if (this.playerPanelMsg != null && !this.playerPanelMsg.deleted) { await this.playerPanelMsg.delete(); }
+                    if (this.playerPanelMsg != null) await this.playerPanelMsg.delete();
                     /* Save potencial vc to connect to */
                     let vcId = this.connection!.joinConfig.channelId;
                     /* Destroy connection */
@@ -639,7 +645,7 @@ export class PandaPlayer implements PandaAudio {
             if (this.queue.length == 0) { await this.chat.send(mPanda.skip.empty); return; }
 
             /* Remove player panel */
-            if (this.playerPanelMsg != null && !this.playerPanelMsg.deleted) { await this.playerPanelMsg.delete(); }
+            if (this.playerPanelMsg != null) await this.playerPanelMsg.delete();
             /* Remove all listners */
             this.player.removeAllListeners();
             /* Skip current request */
@@ -663,7 +669,7 @@ export class PandaPlayer implements PandaAudio {
             /* Queue is empty -> return */
             if (this.queue.length == 0) {
                 /* Remove player panel */
-                if (this.playerPanelMsg != null && !this.playerPanelMsg.deleted) { await this.playerPanelMsg.delete(); }
+                if (this.playerPanelMsg != null) await this.playerPanelMsg.delete();
                 await this.chat.send(mPanda.start.empty); return;
             }
 
@@ -680,7 +686,7 @@ export class PandaPlayer implements PandaAudio {
             this.player
                 .on(AudioPlayerStatus.Idle, async () => {
                     /* Remove player panel */
-                    if (this.playerPanelMsg != null && !this.playerPanelMsg.deleted) { await this.playerPanelMsg.delete(); }
+                    if (this.playerPanelMsg != null) await this.playerPanelMsg.delete();
                     /* Remove all listners */
                     this.player.removeAllListeners();
                     /* Send ended request message */
@@ -692,13 +698,15 @@ export class PandaPlayer implements PandaAudio {
                     /* No panel player was created or it was deleted -> create new player panel */
                     if (this.playerPanelMsg == null || this.playerPanelMsg.deleted) { this.playerPanelMsg = await this.chat.send(this.getPlayerPanel()); }
                     /* Update player panel */
-                    else { await this.playerPanelMsg!.edit(this.getPlayerPanel()); }
+                    if (this.playerPanelMsg != null) { await this.playerPanelMsg.edit(this.getPlayerPanel()); }
+                    /* Create new player panel */
+                    else { this.playerPanelMsg = await this.chat.send(this.getPlayerPanel()); }
                     /* Send paused request message */
                     await this.chat.send(mPanda.start.paused);
                 })
                 .on(AudioPlayerStatus.Playing, async () => {
                     /* Remove player panel */
-                    if (this.playerPanelMsg != null && !this.playerPanelMsg.deleted) { await this.playerPanelMsg.delete(); }
+                    if (this.playerPanelMsg != null) await this.playerPanelMsg.delete();
                     /* Create new player panel */
                     this.playerPanelMsg = await this.chat.send(this.getPlayerPanel());
                 });
