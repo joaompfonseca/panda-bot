@@ -581,6 +581,7 @@ export class PandaPlayer implements PandaAudio {
             if (req.length == 0) { await this.chat.send(mPanda.play.emptyQuery); return; }
             /* Bot is in a different vc of User and is playing -> return */
             if (this.vcId != null && this.vcId != vcId && this.player.state.status != AudioPlayerStatus.Idle) { await this.chat.send(mPanda.play.notSameVC); return; }
+            /* Request is empty -> return */
 
             /* Add request to queue */
             if (!await this.addToPlaylist(req)) return;
