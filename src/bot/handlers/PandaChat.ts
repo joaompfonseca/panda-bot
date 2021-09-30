@@ -1,4 +1,4 @@
-import { InteractionCollector, InteractionCollectorOptions, MessageComponentInteraction, TextBasedChannels } from "discord.js";
+import { MessageCollector, MessageCollectorOptions, TextBasedChannels } from "discord.js";
 import { PandaMessage } from "./PandaMessage.js";
 
 export class PandaChat {
@@ -12,8 +12,8 @@ export class PandaChat {
         this.chat = chat;
     }
 
-    createMessageComponentCollector(options: InteractionCollectorOptions<MessageComponentInteraction>): InteractionCollector<MessageComponentInteraction> {
-        return this.chat.createMessageComponentCollector(options);
+    createMessageCollector(options?: MessageCollectorOptions | undefined): MessageCollector {
+        return this.chat.createMessageCollector(options);
     }
 
     async send(out: string | Object): Promise<PandaMessage> {

@@ -437,7 +437,7 @@ export class PandaPlayer implements PandaAudio {
             /* Create the string */
             let str;
             if (reqs.length == 0) {
-                /* Display empty queue message */
+                /* Empty queue */
                 str = mPanda.getPlaylistPage.empty;
             }
             else {
@@ -717,11 +717,14 @@ export class PandaPlayer implements PandaAudio {
             /* Age Restricted -> return */
             if (msg.startsWith('Status code: 410')) {
                 await this.chat.send(mPanda.start.ageRestricted);
-                await this.skip(this.chat, this.vcId); return;
+                await this.skip(this.chat, this.vcId);
             }
             /* Other Error */
+            else {
             console.warn(`PandaPlayer [start] - ${msg}`);
-            await this.chat.send(mError.executeCmd); return;
+                await this.chat.send(mError.executeCmd);
+            }
+            return;
         }
     }
 

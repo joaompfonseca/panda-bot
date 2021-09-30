@@ -1,5 +1,5 @@
 import { Client, Interaction } from "discord.js";
-import { PandaInteractionChat } from "../commands/PandaInteractionChat.js";
+import { PandaInteractionChat } from "../handlers/PandaInteractionChat.js";
 import { guildHandler } from "../handlers/guilds.js";
 import { cmdHandler } from "../handlers/commands.js";
 
