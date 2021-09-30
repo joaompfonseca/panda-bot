@@ -23,7 +23,8 @@ export async function messageCreate(client: Client, msg: Message): Promise<void>
     const chat = new PandaChat(msg.channel);
     const guild = guildHandler(chat, client, msg.guild!);
     const time = msg.createdTimestamp;
+    const userId = msg.author.id;
     const vcId = msg.member!.voice.channelId;
 
-    await cmdHandler(client, cmd, args, chat, guild, time, vcId); return;
+    await cmdHandler(client, cmd, args, chat, guild, time, userId, vcId); return;
 }

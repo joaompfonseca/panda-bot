@@ -31,6 +31,7 @@ export const mHelp: { [category: string]: { [term: string]: string } } = {
         pause: 'para kit-kat',
         'play [..]': 'dou-te música',
         'queue/playlist [..]?': 'mostro o que está na playlist',
+        'search [..]': 'retorno vários sons para depois escolheres um',
         skip: 'salto para a próximo som',
         'unpause/resume': 'a festa continua'
     }
@@ -57,7 +58,6 @@ export const mPanda = {
         notFound: 'Não encontrei nada que correspondesse ao teu pedido.',
         success: (req: string) => `Adicionei \`${req}\` à playlist.`,
         unavailable: 'O teu pedido encontra-se indisponível para mim.',
-        success: (req: string) => `Adicionei \`${req}\` à playlist.`,
     },
     clear: {
         already: 'Não há nada para limpar!',
@@ -138,6 +138,17 @@ export const mPanda = {
     },
     playlist: {
 
+    },
+    search: {
+        chosen: (res: PandaRequest) => `✅ ${(res.title.length > 55 - res.formatedDuration.length) ? (res.title.substring(0, 55 - res.formatedDuration.length - 3) + '...') : (res.title + ' '.repeat(55 - res.formatedDuration.length - res.title.length))} [${res.formatedDuration}]`,
+        emptyQuery: 'Nem sei o que te faço, então pedes-me para procurar nada?',
+        invalid: 'Essa escolha não é válida, procura novamente.',
+        query: (req: string) => `🔎\t\`${req}\``,
+        userNotVC: 'Não estás num canal de voz!',
+        noResults: 'Não encontrei nada que correspondesse ao teu pedido.',
+        notSameVC: 'Não estamos no mesmo canal de voz!',
+        result: (pos: number, res: PandaRequest) => `${pos}) ${(res.title.length > 56 - pos.toString().length - res.formatedDuration.length) ? (res.title.substring(0, 56 - pos.toString().length - res.formatedDuration.length - 3) + '...') : (res.title + ' '.repeat(56 - pos.toString().length - res.formatedDuration.length - res.title.length))} [${res.formatedDuration}]` ,       
+        timeout: 'Demoraste muito a escolher, procura novamente.'
     },
     skip: {
         botNotVC: 'Não estou num canal de voz!',

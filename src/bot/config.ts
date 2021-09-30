@@ -3,3 +3,4 @@ export const mcServer = 'mc.hypixel.net';
 export const prefix = 'pb.';
 export const queuePageSize = 10;
 export const regSlash = false;
+export const searchSuggestions = 10;

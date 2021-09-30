@@ -72,6 +72,16 @@ export const commands: ApplicationCommandData[] = [
         }]
     },
     {
+        name: 'search',
+        description: 'retorno vários sons para depois escolheres um',
+        options: [{
+            name: 'termo',
+            description: 'matéria prima para eu pesquisar',
+            type: 'STRING',
+            required: true
+        }]
+    },
+    {
         name: 'skip',
         description: 'salto para a próximo som'
     },

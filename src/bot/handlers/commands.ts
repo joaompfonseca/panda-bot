@@ -14,7 +14,7 @@ import { game, help, info, mc, ping, unknown } from '../commands/general.js';
  * @param vcId 
  * @returns 
  */
-export async function cmdHandler(client: Client, cmd: string, args: string, chat: PandaChat, guild: PandaGuild, time: number, vcId: string | null): Promise<void> {
+export async function cmdHandler(client: Client, cmd: string, args: string, chat: PandaChat, guild: PandaGuild, time: number, userId: string, vcId: string | null): Promise<void> {
     switch (cmd) {
         /* General */
         case 'game':        await game(chat, args); break;
@@ -32,9 +32,10 @@ export async function cmdHandler(client: Client, cmd: string, args: string, chat
         case 'play':        await guild.pandaPlayer.play(chat, vcId, args); break;
         case 'playlist':
         case 'queue':       await guild.pandaPlayer.playlist(chat, args); break;
+        case 'search':      await guild.pandaPlayer.search(chat, userId, vcId, args); break;
         case 'skip':        await guild.pandaPlayer.skip(chat, vcId); break;
         case 'resume':
-        case 'unpause':      await guild.pandaPlayer.unpause(chat, vcId); break;
+        case 'unpause':     await guild.pandaPlayer.unpause(chat, vcId); break;
         /* Invalid Command */
         default:            await unknown(chat); break;
     }

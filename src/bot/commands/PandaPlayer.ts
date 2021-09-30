@@ -1,10 +1,10 @@
-import { Client, Guild, InteractionCollector, MessageActionRow, MessageButton, MessageComponentInteraction, MessageEmbed } from 'discord.js';
+import { Client, Guild, InteractionCollector, Message, MessageActionRow, MessageButton, MessageComponentInteraction, MessageEmbed } from 'discord.js';
 import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, NoSubscriberBehavior, VoiceConnection, VoiceConnectionStatus } from '@discordjs/voice';
 import { SoundCloud, Track as Soundcloud_Track, Playlist as Soundcloud_Playlist } from 'scdl-core'; const scdl = new SoundCloud(); scdl.connect();
 import spinfo, { Tracks as Spotify_Playlist_Track } from 'spotify-url-info';
 import ytinfo, { YoutubeVideo as Youtube_Video, Playlist as Youtube_Playlist, YoutubeSearchResults as Youtube_Query } from 'youtube-scrapper';
 import ytdl from 'ytdl-core-discord';
-import { queuePageSize } from '../config.js';
+import { queuePageSize, searchSuggestions } from '../config.js';
 import { formatDuration, formatTextSyntax, spdl } from '../util.js';
 import { mError, mPanda } from './messages.js';
 import { PandaAudio, PandaRequest, PandaRequestTypes } from '../interfaces.js';
@@ -204,7 +204,7 @@ export class PandaPlayer implements PandaAudio {
                 msg.startsWith('Video unavailable')) { await this.chat.send(mPanda.addToPlaylist.unavailable); }
             /* Other Error */
             else {
-            console.warn(`PandaPlayer [addToPlaylist] - ${msg}`);
+                console.warn(`PandaPlayer [addToPlaylist] - ${msg}`);
                 await this.chat.send(mError.executeCmd);
             }
             return false;
@@ -577,11 +577,10 @@ export class PandaPlayer implements PandaAudio {
             this.chat = chat;
             /* User is not in a vc -> return */
             if (vcId == null) { await this.chat.send(mPanda.play.userNotVC); return; }
-            /* Request is empty -> return */
-            if (req.length == 0) { await this.chat.send(mPanda.play.emptyQuery); return; }
             /* Bot is in a different vc of User and is playing -> return */
             if (this.vcId != null && this.vcId != vcId && this.player.state.status != AudioPlayerStatus.Idle) { await this.chat.send(mPanda.play.notSameVC); return; }
             /* Request is empty -> return */
+            if (req.length == 0) { await this.chat.send(mPanda.play.emptyQuery); return; }
 
             /* Add request to queue */
             if (!await this.addToPlaylist(req)) return;
@@ -590,14 +589,8 @@ export class PandaPlayer implements PandaAudio {
             if (this.vcId != null && this.vcId != vcId) this.connection!.disconnect();
             /* Bot is not in a vc or is in a different vc of User -> create a connection */
             if (this.vcId == null || this.vcId != vcId) await this.connectTo(vcId);
-
-            /* Add request to queue */
-            await this.addToPlaylist(req);
             /* Bot is not playing -> start playing */
             if (this.player.state.status == AudioPlayerStatus.Idle) { await this.start(); }
-
-            /* A panel player was created and it wasn't deleted -> update player panel */
-            if (this.playerPanelMsg != null && !this.playerPanelMsg.deleted) { await this.playerPanelMsg!.edit(this.getPlayerPanel()); } 
             return;
         }
         catch (e: any) {
@@ -624,6 +617,112 @@ export class PandaPlayer implements PandaAudio {
         catch (e: any) {
             console.warn(`PandaPlayer [playlist] - ${e.message}`);
             await this.chat.send(mError.executeCmd); return;
+        }
+    }
+
+    /**
+     * Given a query, returns a list of matches from Youtube for the User to pick from.
+     * @param chat 
+     * @param userId
+     * @param vcId 
+     * @param req the search query
+     * @returns 
+     */
+    async search(chat: PandaChat, userId: string, vcId: string | null, req: string): Promise<void> {
+        try {
+            this.chat = chat;
+            /* User is not in a vc -> return */
+            if (vcId == null) { await this.chat.send(mPanda.search.userNotVC); return; }
+            /* Bot is in a different vc of User and is playing -> return */
+            if (this.vcId != null && this.vcId != vcId && this.player.state.status != AudioPlayerStatus.Idle) { await this.chat.send(mPanda.search.notSameVC); return; }
+            /* Request is empty -> return */
+            if (req.length == 0) { await this.chat.send(mPanda.search.emptyQuery); return; }
+
+            /* Get array of results to display */
+            let results: PandaRequest[] = (await ytinfo.search(req))
+                .videos
+                .slice(0, searchSuggestions)
+                .map(v => {
+                    return {
+                        duration: v.duration,
+                        formatedDuration: formatDuration(v.duration),
+                        title: v.title,
+                        type: PandaRequestTypes.YOUTUBE,
+                        url: v.url
+                    }
+                });
+
+            /* Create the string */
+            let str: string;
+            if (results.length == 0) {
+                /* No results */
+                str = mPanda.search.noResults;
+            }
+            else {
+                /* Format results */
+                str = results.map((res, idx) => mPanda.search.result(idx + 1, res)).join('\n');
+            }
+            /* Create the string's embed */
+            let embed = new MessageEmbed({ title: mPanda.search.query(req), description: formatTextSyntax(str) });
+            /* Send results */
+            let resultsMsg = await this.chat.send({ embeds: [embed] });
+
+            /* No results -> return */
+            if (results.length == 0) return;
+
+            /* Create the filter */
+            let filter = (msg: Message): boolean => msg.author.id == userId;
+            /* Create the collector */
+            let collector = this.chat.createMessageCollector({
+                filter: filter,
+                time: 1000 * 30
+            })
+                .once('collect', async msg => {
+                    let chat = new PandaChat(msg.channel);
+                    let pos = parseInt(msg.content);
+                    let vcId = msg.member!.voice.channelId;
+
+                    /* Create response embed */
+                    let embed = new MessageEmbed({ title: mPanda.search.query(req) });
+
+                    /* Invalid selection */
+                    if (new RegExp(/\D/).test(msg.content) || parseInt(msg.content) < 1 || parseInt(msg.content) > results.length) {
+                        /* Send response */
+                        await resultsMsg.edit({ embeds: [embed.setDescription(formatTextSyntax(mPanda.search.invalid))] });
+                    }
+                    else {
+                        /* Send response */
+                        await resultsMsg.edit({ embeds: [embed.setDescription(formatTextSyntax(mPanda.search.chosen(results[pos - 1])))] });
+                        /* Play chosen result */
+                        await this.play(chat, vcId, results[pos - 1].url);
+                    }
+
+                    /* Remove all listners */
+                    collector.removeAllListeners();
+                    /* Stop the collector */
+                    collector.stop();
+                })
+                .once('end', async () => {
+                    /* Create timeout's embed */
+                    let embed = new MessageEmbed({ title: mPanda.search.query(req), description: formatTextSyntax(mPanda.search.timeout) });
+                    /* Send timeout */
+                    await resultsMsg.edit({ embeds: [embed] });
+                });
+            return;
+        }
+        catch (e: any) {
+            let msg: string = (e.message == undefined) ? e : e.message;
+            /* No results */
+            if (msg.startsWith('Cannot read properties of undefined')) {
+                let embed = new MessageEmbed({ title: mPanda.search.query(req), description: formatTextSyntax(mPanda.search.noResults) });
+                await this.chat.send({ embeds: [embed] });
+            }
+            /* Other error */
+            else {
+                console.warn(`PandaPlayer [search] - ${msg}`);
+                await this.chat.send(mError.executeCmd);
+            }
+            return;
         }
     }
 
@@ -696,8 +795,6 @@ export class PandaPlayer implements PandaAudio {
                     await this.start();
                 })
                 .on(AudioPlayerStatus.Paused, async () => {
-                    /* No panel player was created or it was deleted -> create new player panel */
-                    if (this.playerPanelMsg == null || this.playerPanelMsg.deleted) { this.playerPanelMsg = await this.chat.send(this.getPlayerPanel()); }
                     /* Update player panel */
                     if (this.playerPanelMsg != null) { await this.playerPanelMsg.edit(this.getPlayerPanel()); }
                     /* Create new player panel */
@@ -722,7 +819,7 @@ export class PandaPlayer implements PandaAudio {
             }
             /* Other Error */
             else {
-            console.warn(`PandaPlayer [start] - ${msg}`);
+                console.warn(`PandaPlayer [start] - ${msg}`);
                 await this.chat.send(mError.executeCmd);
             }
             return;
