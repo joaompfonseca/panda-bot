@@ -23,7 +23,7 @@ export class PandaInteractionMessage extends PandaMessage {
         catch (e: any) {
             let msg = e.message;
             /* Other Error */
-            if (!msg.startsWith('Unknown Message')) console.warn(e.message);
+            if (!msg.startsWith('Unknown Message')) console.warn(`PandaInteractionMessage [delete] - ${msg}`);
             return this;
         }
     }
@@ -41,7 +41,7 @@ export class PandaInteractionMessage extends PandaMessage {
         catch (e: any) {
             let msg = e.message;
             /* Other Error */
-            if (!msg.startsWith('Unknown Message')) console.warn(e.message);
+            if (!msg.startsWith('Unknown Message')) console.warn(`PandaInteractionMessage [edit] - ${msg}`);
             return this;
         }
     }

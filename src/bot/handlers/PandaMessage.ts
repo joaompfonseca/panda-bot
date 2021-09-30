@@ -25,7 +25,7 @@ export class PandaMessage {
         catch (e: any) {
             let msg = e.message;
             /* Other Error */
-            if (!msg.startsWith('Unknown Message')) console.warn(e.message);
+            if (!msg.startsWith('Unknown Message')) console.warn(`PandaMessage [delete] - ${msg}`);
             return this;
         }
     }
@@ -40,7 +40,7 @@ export class PandaMessage {
         catch (e: any) {
             let msg = e.message;
             /* Other Error */
-            if (!msg.startsWith('Unknown Message')) console.warn(e.message);
+            if (!msg.startsWith('Unknown Message')) console.warn(`PandaMessage [edit] - ${msg}`);
             return this;
         }
     }
