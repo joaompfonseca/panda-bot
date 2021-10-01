@@ -27,7 +27,7 @@ export function formatDuration(duration: number): string {
  * @returns 
  */
 export function formatTextSyntax(str: string): string {
-    return `\`\`\`elm\n${str.replaceAll(`'`, '`')}\`\`\``;
+    return `\`\`\`elm\n${str.replaceAll(/['"]/g, '`')}\`\`\``;
 }
 
 /**

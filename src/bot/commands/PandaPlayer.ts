@@ -184,7 +184,7 @@ export class PandaPlayer implements PandaAudio {
             /* Remove player panel */
             if (this.playerPanelMsg != null) await this.playerPanelMsg.delete();
             /* Create new player panel */
-            if (this.player.state.status == AudioPlayerStatus.Playing || this.player.state.status == AudioPlayerStatus.Paused) { this.playerPanelMsg = await this.chat.send(this.getPlayerPanel()); }
+            if (this.player.state.status == AudioPlayerStatus.Paused || this.player.state.status == AudioPlayerStatus.Playing) { this.playerPanelMsg = await this.chat.send(this.getPlayerPanel()); }
 
             return true;
         }
@@ -582,6 +582,9 @@ export class PandaPlayer implements PandaAudio {
             /* Request is empty -> return */
             if (req.length == 0) { await this.chat.send(mPanda.play.emptyQuery); return; }
 
+            /* Bot is in a different vc of User -> leave current vc */
+            if (this.vcId != null && this.vcId != vcId) this.connection!.disconnect();
+
             /* Add request to queue */
             if (!await this.addToPlaylist(req)) return;
 
@@ -589,8 +592,9 @@ export class PandaPlayer implements PandaAudio {
             if (this.vcId != null && this.vcId != vcId) this.connection!.disconnect();
             /* Bot is not in a vc or is in a different vc of User -> create a connection */
             if (this.vcId == null || this.vcId != vcId) await this.connectTo(vcId);
+
             /* Bot is not playing -> start playing */
-            if (this.player.state.status == AudioPlayerStatus.Idle) { await this.start(); }
+            if (this.player.state.status == AudioPlayerStatus.Idle) await this.start();
             return;
         }
         catch (e: any) {
@@ -675,7 +679,7 @@ export class PandaPlayer implements PandaAudio {
             /* Create the collector */
             let collector = this.chat.createMessageCollector({
                 filter: filter,
-                time: 1000 * 30
+                time: 1000 * searchTimeout
             })
                 .once('collect', async msg => {
                     let chat = new PandaChat(msg.channel);
