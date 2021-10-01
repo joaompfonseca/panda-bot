@@ -1,6 +1,19 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.5.0] - 2021-10-01
+### Added
+- New `search` command, that given a search query returns a list of matches from Youtube for the User to pick from.
+- New connection timeout that disconnects Bot from its voice channel if inactive for too long.
+
+### Changed
+- Now player panel is brought down when a new request is added to the queue.
+
+### Fixed
+- Some commands being executable when they shouldn't.
+- Bot connecting to User's voice channel even if request song was not added to queue.
+- Player panel displaying more than once.
+
 ## [0.4.0] - 2021-09-28
 ### Added
 - New `leave` command alias: `stop`.
@@ -96,6 +109,7 @@ All notable changes to this project will be documented in this file.
 
 ## [0.0.0-12.5.3] - 2021-08-24
 
+[0.5.0]: https://github.com/joaompfonseca/panda-bot/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/joaompfonseca/panda-bot/compare/v0.3.3...v0.4.0
 [0.3.3]: https://github.com/joaompfonseca/panda-bot/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/joaompfonseca/panda-bot/compare/v0.3.1...v0.3.2
