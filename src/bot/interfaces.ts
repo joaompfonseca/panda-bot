@@ -26,6 +26,7 @@ export interface PandaAudio {
     chat: PandaChat;
     client: Client;
     connection: VoiceConnection | null;
+    connectionTimeout: NodeJS.Timeout;
     guildId: string;
     intCollector: InteractionCollector<MessageComponentInteraction>;
     player: AudioPlayer;
@@ -36,6 +37,7 @@ export interface PandaAudio {
 
     addToPlaylist(req: string): Promise<boolean>;
     clear(chat: PandaChat, vcId: string | null): Promise<void>;
+    clearConnectionTimeout(): void;
     collect(int: MessageComponentInteraction): Promise<void>;
     connectTo(vcId: string): Promise<void>;
     getPlayerPanel(): { components: MessageActionRow[], embeds: MessageEmbed[] };
@@ -45,6 +47,7 @@ export interface PandaAudio {
     pause(chat: PandaChat, vcId: string | null): Promise<void>;
     play(chat: PandaChat, vcId: string | null, req: string): Promise<void>;
     playlist(chat: PandaChat, page: string): Promise<void>;
+    setConnectionTimeout(): void;
     search(chat: PandaChat, userId: string, vcId: string | null, req: string): Promise<void>;
     skip(chat: PandaChat, vcId: string | null): Promise<void>;
     start(): Promise<void>;

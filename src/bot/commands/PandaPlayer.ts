@@ -4,7 +4,7 @@ import { SoundCloud, Track as Soundcloud_Track, Playlist as Soundcloud_Playlist 
 import spinfo, { Tracks as Spotify_Playlist_Track } from 'spotify-url-info';
 import ytinfo, { YoutubeVideo as Youtube_Video, Playlist as Youtube_Playlist, YoutubeSearchResults as Youtube_Query } from 'youtube-scrapper';
 import ytdl from 'ytdl-core-discord';
-import { queuePageSize, searchSuggestions } from '../config.js';
+import { connectionTimeout, queuePageSize, searchSuggestions, searchTimeout } from '../config.js';
 import { formatDuration, formatTextSyntax, spdl } from '../util.js';
 import { mError, mPanda } from './messages.js';
 import { PandaAudio, PandaRequest, PandaRequestTypes } from '../interfaces.js';
@@ -15,6 +15,7 @@ export class PandaPlayer implements PandaAudio {
     adapterCreator: DiscordGatewayAdapterCreator;
     chat: PandaChat;
     connection: VoiceConnection | null;
+    connectionTimeout: NodeJS.Timeout;
     client: Client;
     guildId: string;
     intCollector: InteractionCollector<MessageComponentInteraction>;
@@ -34,6 +35,7 @@ export class PandaPlayer implements PandaAudio {
         this.adapterCreator = guild.voiceAdapterCreator;
         this.chat = chat;
         this.connection = null;
+        this.connectionTimeout = setTimeout(() => {});
         this.client = client;
         this.guildId = guild.id;
         this.intCollector = new InteractionCollector<MessageComponentInteraction>(client, {
@@ -220,6 +222,7 @@ export class PandaPlayer implements PandaAudio {
     async clear(chat: PandaChat, vcId: string | null): Promise<void> {
         try {
             this.chat = chat;
+            this.setConnectionTimeout();
             /* User is not in a vc -> return */
             if (vcId == null) { await this.chat.send(mPanda.clear.userNotVC); return; }
             /* Bot is not in a vc -> return */
@@ -247,6 +250,15 @@ export class PandaPlayer implements PandaAudio {
     }
 
     /**
+     * Clears the connection inactivity timeout.
+     * @returns 
+     */
+    clearConnectionTimeout(): void {
+        /* Clear timeout */
+        clearTimeout(this.connectionTimeout); return;
+    }
+
+    /**
      * Runs when collector's "collect" event is triggered.
      * @param int 
      * @returns
@@ -254,6 +266,7 @@ export class PandaPlayer implements PandaAudio {
     async collect(int: MessageComponentInteraction): Promise<void> {
         try {
             this.chat.chat = int.channel!;
+            this.setConnectionTimeout();
 
             /**
              * Get type, command and data from interaction
@@ -349,9 +362,12 @@ export class PandaPlayer implements PandaAudio {
                     this.player.stop(true);
                     /* Clear vars */
                     this.connection = null;
+                    this.clearConnectionTimeout();
                     this.queue = [];
                     this.vcId = null;
                 });
+
+                this.setConnectionTimeout();
             });
             return;
         }
@@ -493,6 +509,7 @@ export class PandaPlayer implements PandaAudio {
     async join(chat: PandaChat, vcId: string | null): Promise<void> {
         try {
             this.chat = chat;
+            this.setConnectionTimeout();
             /* User is not in a vc -> return */
             if (vcId == null) { await this.chat.send(mPanda.join.userNotVC); return; }
             /* Bot is in the same vc as User -> return */
@@ -520,6 +537,7 @@ export class PandaPlayer implements PandaAudio {
     async leave(chat: PandaChat, vcId: string | null): Promise<void> {
         try {
             this.chat = chat;
+            this.setConnectionTimeout();
             /* User is not in a vc -> return */
             if (vcId == null) { await this.chat.send(mPanda.leave.userNotVC); return; }
             /* Bot is not in a vc -> return */
@@ -545,6 +563,7 @@ export class PandaPlayer implements PandaAudio {
     async pause(chat: PandaChat, vcId: string | null): Promise<void> {
         try {
             this.chat = chat;
+            this.setConnectionTimeout();
             /* User is not in a vc -> return */
             if (vcId == null) { await this.chat.send(mPanda.pause.userNotVC); return; }
             /* Bot is not in a vc -> return */
@@ -575,6 +594,7 @@ export class PandaPlayer implements PandaAudio {
     async play(chat: PandaChat, vcId: string | null, req: string): Promise<void> {
         try {
             this.chat = chat;
+            this.setConnectionTimeout();
             /* User is not in a vc -> return */
             if (vcId == null) { await this.chat.send(mPanda.play.userNotVC); return; }
             /* Bot is in a different vc of User and is playing -> return */
@@ -588,8 +608,6 @@ export class PandaPlayer implements PandaAudio {
             /* Add request to queue */
             if (!await this.addToPlaylist(req)) return;
 
-            /* Bot is in a different vc of User -> leave current vc */
-            if (this.vcId != null && this.vcId != vcId) this.connection!.disconnect();
             /* Bot is not in a vc or is in a different vc of User -> create a connection */
             if (this.vcId == null || this.vcId != vcId) await this.connectTo(vcId);
 
@@ -612,6 +630,7 @@ export class PandaPlayer implements PandaAudio {
     async playlist(chat: PandaChat, pageStr: string): Promise<void> {
         try {
             this.chat = chat;
+            this.setConnectionTimeout();
             /* Page number is not given, is less than one or is not a number -> request queue's first page */
             let page = (pageStr.length == 0 || parseInt(pageStr) < 1 || new RegExp(/\D/).test(pageStr)) ? 1 : parseInt(pageStr);
 
@@ -625,6 +644,20 @@ export class PandaPlayer implements PandaAudio {
     }
 
     /**
+     * Sets the connection inactivity timeout.
+     * @returns 
+     */
+    setConnectionTimeout(): void {
+        /* Bot is paused or is playing -> return */
+        if (this.player.state.status == AudioPlayerStatus.Paused || this.player.state.status == AudioPlayerStatus.Playing) return;
+        
+        /* Clear timeout */
+        clearTimeout(this.connectionTimeout);
+        /* Create timeout */
+        this.connectionTimeout = setTimeout(() => this.connection!.disconnect(), 1000 * connectionTimeout); return;
+    }
+
+    /**
      * Given a query, returns a list of matches from Youtube for the User to pick from.
      * @param chat 
      * @param userId
@@ -635,6 +668,7 @@ export class PandaPlayer implements PandaAudio {
     async search(chat: PandaChat, userId: string, vcId: string | null, req: string): Promise<void> {
         try {
             this.chat = chat;
+            this.setConnectionTimeout();
             /* User is not in a vc -> return */
             if (vcId == null) { await this.chat.send(mPanda.search.userNotVC); return; }
             /* Bot is in a different vc of User and is playing -> return */
@@ -739,6 +773,7 @@ export class PandaPlayer implements PandaAudio {
     async skip(chat: PandaChat, vcId: string | null): Promise<void> {
         try {
             this.chat = chat;
+            this.setConnectionTimeout();
             /* User is not in a vc -> return */
             if (vcId == null) { await this.chat.send(mPanda.skip.userNotVC); return; }
             /* Bot is not in a vc -> return */
@@ -772,8 +807,7 @@ export class PandaPlayer implements PandaAudio {
         try {
             /* Queue is empty -> return */
             if (this.queue.length == 0) {
-                /* Remove player panel */
-                if (this.playerPanelMsg != null) await this.playerPanelMsg.delete();
+                this.setConnectionTimeout();
                 await this.chat.send(mPanda.start.empty); return;
             }
 
@@ -799,6 +833,7 @@ export class PandaPlayer implements PandaAudio {
                     await this.start();
                 })
                 .on(AudioPlayerStatus.Paused, async () => {
+                    this.clearConnectionTimeout();
                     /* Update player panel */
                     if (this.playerPanelMsg != null) { await this.playerPanelMsg.edit(this.getPlayerPanel()); }
                     /* Create new player panel */
@@ -807,6 +842,7 @@ export class PandaPlayer implements PandaAudio {
                     await this.chat.send(mPanda.start.paused);
                 })
                 .on(AudioPlayerStatus.Playing, async () => {
+                    this.clearConnectionTimeout();
                     /* Remove player panel */
                     if (this.playerPanelMsg != null) await this.playerPanelMsg.delete();
                     /* Create new player panel */
@@ -839,6 +875,7 @@ export class PandaPlayer implements PandaAudio {
     async unpause(chat: PandaChat, vcId: string | null): Promise<void> {
         try {
             this.chat = chat;
+            this.setConnectionTimeout();
             /* User is not in a vc -> return */
             if (vcId == null) { await this.chat.send(mPanda.unpause.userNotVC); return; }
             /* Bot is not in a vc -> return */
