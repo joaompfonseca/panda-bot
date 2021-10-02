@@ -650,7 +650,7 @@ export class PandaPlayer implements PandaAudio {
     setConnectionTimeout(): void {
         /* Bot is paused or is playing -> return */
         if (this.player.state.status == AudioPlayerStatus.Paused || this.player.state.status == AudioPlayerStatus.Playing) return;
-        
+
         /* Clear timeout */
         clearTimeout(this.connectionTimeout);
         /* Create timeout */
@@ -822,6 +822,10 @@ export class PandaPlayer implements PandaAudio {
             this.player.play(this.resource);
             /* Player listners */
             this.player
+                .on(AudioPlayerStatus.AutoPaused, async () => {
+                    /* Remove player panel */
+                    if (this.playerPanelMsg != null) await this.playerPanelMsg.delete();
+                })
                 .on(AudioPlayerStatus.Idle, async () => {
                     /* Remove player panel */
                     if (this.playerPanelMsg != null) await this.playerPanelMsg.delete();
