@@ -43,7 +43,7 @@ export class PandaPlayer implements PandaAudio {
             componentType: 'BUTTON'
         })
             .on('collect', async int => await this.collect(int));
-        this.player = createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Pause } });
+        this.player = createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Play } });
         this.playerPanelMsg = null;
         this.queue = [];
         this.resource = null;
@@ -339,15 +339,13 @@ export class PandaPlayer implements PandaAudio {
             this.connection.once(VoiceConnectionStatus.Ready, async () => {
                 this.vcId = vcId;
                 await this.chat.send(mPanda.connectTo.connected(this.vcId!));
-
+                
                 /* Subscribe the player */
                 this.connection!.subscribe(this.player);
 
                 /* Bot is disconnected */
                 this.connection!.once(VoiceConnectionStatus.Disconnected, async () => {
                     await this.chat.send(mPanda.connectTo.disconnected(this.vcId!));
-                    /* Remove player panel */
-                    if (this.playerPanelMsg != null) await this.playerPanelMsg.delete();
                     /* Save potencial vc to connect to */
                     let vcId = this.connection!.joinConfig.channelId;
                     /* Destroy connection */
@@ -356,6 +354,8 @@ export class PandaPlayer implements PandaAudio {
                     /* Bot is moved to another vc */
                     if (vcId != null && vcId != this.vcId) { await this.connectTo(vcId); return; }
 
+                    /* Remove player panel */
+                    if (this.playerPanelMsg != null) await this.playerPanelMsg.delete();
                     /* Remove all player listners */
                     this.player.removeAllListeners();
                     /* Stop current request */
@@ -822,10 +822,6 @@ export class PandaPlayer implements PandaAudio {
             this.player.play(this.resource);
             /* Player listners */
             this.player
-                .on(AudioPlayerStatus.AutoPaused, async () => {
-                    /* Remove player panel */
-                    if (this.playerPanelMsg != null) await this.playerPanelMsg.delete();
-                })
                 .on(AudioPlayerStatus.Idle, async () => {
                     /* Remove player panel */
                     if (this.playerPanelMsg != null) await this.playerPanelMsg.delete();
