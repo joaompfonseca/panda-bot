@@ -186,7 +186,7 @@ export class PandaPlayer implements PandaAudio {
             /* Remove player panel */
             if (this.playerPanelMsg != null) await this.playerPanelMsg.delete();
             /* Create new player panel */
-            if (this.vcId != null && this.player.state.status == AudioPlayerStatus.Paused || this.player.state.status == AudioPlayerStatus.Playing) { this.playerPanelMsg = await this.chat.send(this.getPlayerPanel()); }
+            if (this.vcId != null && (this.player.state.status == AudioPlayerStatus.Paused || this.player.state.status == AudioPlayerStatus.Playing)) { this.playerPanelMsg = await this.chat.send(this.getPlayerPanel()); }
 
             return true;
         }
