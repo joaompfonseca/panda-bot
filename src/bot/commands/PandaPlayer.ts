@@ -35,7 +35,7 @@ export class PandaPlayer implements PandaAudio {
         this.adapterCreator = guild.voiceAdapterCreator;
         this.chat = chat;
         this.connection = null;
-        this.connectionTimeout = setTimeout(() => {});
+        this.connectionTimeout = setTimeout(() => { });
         this.client = client;
         this.guildId = guild.id;
         this.intCollector = new InteractionCollector<MessageComponentInteraction>(client, {
@@ -339,7 +339,7 @@ export class PandaPlayer implements PandaAudio {
             this.connection.once(VoiceConnectionStatus.Ready, async () => {
                 this.vcId = vcId;
                 await this.chat.send(mPanda.connectTo.connected(this.vcId!));
-                
+
                 /* Subscribe the player */
                 this.connection!.subscribe(this.player);
 
@@ -654,7 +654,7 @@ export class PandaPlayer implements PandaAudio {
         /* Clear timeout */
         clearTimeout(this.connectionTimeout);
         /* Create timeout */
-        this.connectionTimeout = setTimeout(() => this.connection!.disconnect(), 1000 * connectionTimeout); return;
+        this.connectionTimeout = setTimeout(() => { if (this.connection != null) this.connection.disconnect() }, 1000 * connectionTimeout); return;
     }
 
     /**
