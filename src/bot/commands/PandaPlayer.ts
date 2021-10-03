@@ -10,7 +10,6 @@ import { mError, mPanda } from './messages.js';
 import { PandaAudio, PandaRequest, PandaRequestTypes } from '../interfaces.js';
 import { PandaMessage } from '../handlers/PandaMessage.js';
 import { PandaChat } from '../handlers/PandaChat.js';
-import { AnyRecordWithTtl } from 'dns';
 
 export class PandaPlayer implements PandaAudio {
     adapterCreator: DiscordGatewayAdapterCreator;
