@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.5.3] - 2021-10-03
+### Fixed
+- Bot crashing due to Audio Player error not being handled. If there is an error playing a request, it ends and plays the next one.
+
 ## [0.5.2] - 2021-10-02
 ### Fixed
 - Connection timeout execution when Bot wasn't connected.
@@ -116,6 +120,7 @@ All notable changes to this project will be documented in this file.
 
 ## [0.0.0-12.5.3] - 2021-08-24
 
+[0.5.3]: https://github.com/joaompfonseca/panda-bot/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/joaompfonseca/panda-bot/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/joaompfonseca/panda-bot/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/joaompfonseca/panda-bot/compare/v0.4.0...v0.5.0
