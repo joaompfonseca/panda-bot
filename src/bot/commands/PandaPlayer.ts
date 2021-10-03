@@ -10,6 +10,7 @@ import { mError, mPanda } from './messages.js';
 import { PandaAudio, PandaRequest, PandaRequestTypes } from '../interfaces.js';
 import { PandaMessage } from '../handlers/PandaMessage.js';
 import { PandaChat } from '../handlers/PandaChat.js';
+import { AnyRecordWithTtl } from 'dns';
 
 export class PandaPlayer implements PandaAudio {
     adapterCreator: DiscordGatewayAdapterCreator;
@@ -847,7 +848,8 @@ export class PandaPlayer implements PandaAudio {
                     if (this.playerPanelMsg != null) await this.playerPanelMsg.delete();
                     /* Create new player panel */
                     this.playerPanelMsg = await this.chat.send(this.getPlayerPanel());
-                });
+                })
+                .on('error', () => { });
             return;
         }
         catch (e: any) {
